@@ -1,3 +1,4 @@
+
 *.spec
 
 # Installer logs
@@ -8,8 +9,8 @@ pip-delete-this-directory.txt
 
 .tox/
 .nox/
-#.coverage
-#.coverage.*
+.coverage
+.coverage.*
 .cache
 nosetests.xml
 coverage.xml
@@ -85,9 +86,6 @@ ipython_config.py
 # PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
 __pypackages__/
 
-__pycache__/
-
-
 # Celery stuff
 celerybeat-schedule
 celerybeat.pid
@@ -97,7 +95,7 @@ celerybeat.pid
 
 # Environments
 
-config/.env
+.env
 .venv
 env/
 venv/
@@ -135,3 +133,5 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
+
+__pycache__/
