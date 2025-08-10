@@ -1,9 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .forms import UserRegistrationForm, UserProfileForm
-from django.views.generic.edit import CreateView
-from django.core.mail import send_mail
+from .forms import  UserProfileForm
 from django.core.mail import BadHeaderError
 from smtplib import SMTPAuthenticationError
 from .models import CustomUser
