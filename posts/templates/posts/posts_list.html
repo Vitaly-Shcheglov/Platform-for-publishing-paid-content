@@ -1,0 +1,14 @@
+{% extends 'posts/base.html' %}
+
+{% block title %}Список публикаций{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Список публикаций</h1>
+
+    <p><a href="{% url 'posts_free' %}">Бесплатные публикации</a></p>
+    <p><a href="{% url 'posts_paid' %}">Платные публикации</a></p>
+
+    <a href="{% url 'home' %}" class="btn btn-secondary mt-3">Вернуться на главную</a>
+</div>
+{% endblock %}

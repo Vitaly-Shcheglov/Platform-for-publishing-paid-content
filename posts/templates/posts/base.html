@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Контент Платформа{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+     <style>
+        body {
+            background-color: #f0f8ff; /* Светлый фон */
+            color: #333; /* Темный текст */
+        }
+        h1 {
+            color: #6c63ff; /* Цвет заголовка */
+        }
+        .btn-primary {
+            background-color: #6c63ff; /* Цвет кнопки */
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #5a52e0; /* Цвет кнопки при наведении */
+        }
+        footer {
+            background-color: #f8f9fa; /* Цвет футера */
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <footer>
+        <p>© 2025 Контент Платформа</p>
+    </footer>
+</body>
+</html>

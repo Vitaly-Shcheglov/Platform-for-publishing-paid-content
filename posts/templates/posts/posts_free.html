@@ -1,0 +1,20 @@
+{% extends 'posts/base.html' %}
+
+{% block title %}Бесплатные публикации{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Бесплатные публикации</h1>
+    <p>Бесплатные записи доступны всем пользователям без регистрации. Вы можете просматривать и читать их в любое время.</p>
+    <ul>
+        {% for post in freeposts %}
+            <li><a href="{% url 'postdetail' post.id %}">{{ post.title }}</a></li>
+        {% empty %}
+            <li>Нет бесплатных публикаций.</li>
+            <a href="{% url 'add_post' %}" class="btn btn-primary mt-3">Добавить запись</a>
+            <a class="p-2 btn btn-outline-primary" href="/post_list/">Список публикаций</a>
+            <a href="{% url 'home' %}" class="btn btn-secondary mt-3">Вернуться на главную</a>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

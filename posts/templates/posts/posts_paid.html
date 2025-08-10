@@ -1,0 +1,20 @@
+{% extends 'posts/base.html' %}
+
+{% block title %}Платные публикации{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Платные публикации</h1>
+    </p>Платные записи доступны только авторизованным пользователям, которые оплатили разовую подписку. Подписавшись, вы получите доступ к эксклюзивному контенту!</p>
+    <ul>
+        {% for post in paid_posts %}
+            <li><a href="{% url 'post_detail' post.id %}">{{ post.title }}</a></li>
+        {% empty %}
+            <li>Нет платных публикаций.</li>
+            <a href="{% url 'add_post' %}" class="btn btn-primary mt-3">Добавить запись</a>
+            <a class="p-2 btn btn-outline-primary" href="/post_list/">Список публикаций</a>
+            <a href="{% url 'home' %}" class="btn btn-secondary mt-3">Вернуться на главную</a>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
