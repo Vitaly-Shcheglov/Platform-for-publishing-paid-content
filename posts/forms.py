@@ -1,5 +1,5 @@
 from django import forms
-from .models import Post, Category, Subcategory
+from .models import Post, Category, Subcategory, Subscription
 from django.core.exceptions import ValidationError
 
 FORBIDDEN_WORDS = [
@@ -53,3 +53,9 @@ class PostForm(forms.ModelForm):
                 pass
         elif self.instance.pk:
             self.fields['subcategory'].queryset = self.instance.category.subcategories.order_by('name')
+
+
+class SubscriptionForm(forms.ModelForm):
+    class Meta:
+        model = Subscription
+        fields = ['plan', 'end_date']

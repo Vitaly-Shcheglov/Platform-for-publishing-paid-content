@@ -6,6 +6,8 @@ from .views import (
     UserProfileView,
     UserListView,
     block_user,
+    register_view,
+    login_view,
 )
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.contrib.auth.views import (
@@ -19,8 +21,10 @@ from django.contrib.auth.views import (
 urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path("register/", UserRegisterView.as_view(), name="register"),
-    path("login/", LoginView.as_view(), name="login"),
+    path("register/", register_view, name="register"),
+    path("api/register/", UserRegisterView.as_view(), name="api_register"),
+    path("login/", login_view, name="login"),
+    path("api/login/", LoginView.as_view(), name="api_login"),
     path("profile/edit/", ProfileEditView.as_view(), name="profile_edit"),
     path("logout/", LogoutView.as_view(next_page="home"), name="logout"),
     path("profile/", UserProfileView.as_view(), name="profile"),

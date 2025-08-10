@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .forms import  UserProfileForm
+from .forms import  UserProfileForm, UserRegistrationForm
 from django.core.mail import BadHeaderError
 from smtplib import SMTPAuthenticationError
 from .models import CustomUser
@@ -12,6 +12,8 @@ from django.utils.decorators import method_decorator
 from rest_framework.permissions import IsAuthenticated
 from django.core.mail import send_mail
 from .serializers import UserRegistrationSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+from django.contrib import messages
 
 
 User = get_user_model()
@@ -120,3 +122,55 @@ def block_user(request, user_id):
     user.is_blocked = not user.is_blocked
     user.save()
     return redirect("user_list")
+
+def register_view(request):
+    if request.method == "POST":
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+
+            try:
+                send_mail(
+                    "Добро пожаловать!",
+                    "Спасибо за регистрацию на нашем сайте.",
+                    "from@example.com",
+                    [user.email],
+                    fail_silently=False,
+                )
+            except SMTPAuthenticationError:
+                print("Ошибка аутентификации SMTP: неверный пользователь или пароль.")
+            except BadHeaderError:
+                print("Некорректный заголовок письма.")
+            except Exception as e:
+                print(f"Ошибка при отправке письма: {e}")
+
+            return redirect("login")
+    else:
+        form = UserRegistrationForm()
+
+    return render(request, "users/register.html", {"form": form})
+
+def login_view(request):
+    if request.method == "POST":
+        phone_number = request.POST.get("phone_number")
+        password = request.POST.get("password")
+        user = authenticate(request, phone_number=phone_number, password=password)
+
+        if user is not None:
+            login(request, user)
+            messages.success(request, "Успешный вход в систему!")
+            return redirect("home")
+        else:
+            messages.error(request, "Неверные учетные данные.")
+
+    return render(request, "users/login.html")
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    """
+    View для получения JWT токена.
+
+    Позволяет пользователям получать токен для аутентификации.
+    Доступен для всех пользователей (включая неаутентифицированных).
+    """
+    permission_classes = []

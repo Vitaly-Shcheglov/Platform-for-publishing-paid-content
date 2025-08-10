@@ -1,6 +1,6 @@
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.shortcuts import render, get_object_or_404, redirect
-from .forms import PostForm
+from .forms import PostForm, SubscriptionForm
 from django.urls import reverse_lazy
 from .models import Post, Category, Subcategory
 from django.http import HttpResponse, HttpResponseForbidden
@@ -30,6 +30,7 @@ from django.views.decorators.csrf import csrf_exempt
 from drf_yasg.utils import swagger_auto_schema
 from .models import Subscription
 from .serializers import SubscriptionSerializer
+from .forms import PostForm, SubscriptionForm
 
 
 class HomeView(ListView):
@@ -282,3 +283,36 @@ class SubscriptionView(APIView):
     def get_template(self, request):
         """Возвращает шаблон для управления подписками."""
         return render(request, 'subscription.html')
+
+
+@login_required
+def subscription_view(request):
+    if request.method == "POST":
+        form = SubscriptionForm(request.POST)
+        if form.is_valid():
+            subscription_data = form.cleaned_data
+
+            subscription, created = Subscription.objects.get_or_create(
+                user=request.user,
+                defaults={
+                    'plan': subscription_data['plan'],
+                    'end_date': subscription_data['end_date'],
+                    'is_active': True
+                }
+            )
+
+            if not created:
+                subscription.plan = subscription_data['plan']
+                subscription.end_date = subscription_data['end_date']
+                subscription.is_active = True
+                subscription.save()
+
+            return redirect("subscription_success")
+    else:
+        form = SubscriptionForm()
+
+    return render(request, "posts/subscription.html", {"form": form})
+
+def subscription_success_view(request):
+    """Страница успеха после подписки."""
+    return render(request, "users/subscription_success.html")
