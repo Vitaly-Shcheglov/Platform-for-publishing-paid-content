@@ -11,6 +11,7 @@
             <li><a href="{% url 'post_detail' post.id %}">{{ post.title }}</a></li>
         {% empty %}
             <li>Нет платных публикаций.</li>
+            <a href="{% url 'subscription' %}" class="btn btn-primary">Создать подписку</a>
             <a href="{% url 'add_post' %}" class="btn btn-primary mt-3">Добавить запись</a>
             <a class="p-2 btn btn-outline-primary" href="/post_list/">Список публикаций</a>
             <a href="{% url 'home' %}" class="btn btn-secondary mt-3">Вернуться на главную</a>

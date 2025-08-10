@@ -14,6 +14,22 @@ from users.models import CustomUser
 from django.views.generic import ListView
 from django.db import connection
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import status
+from .models import Subscription
+from .serializers import SubscriptionSerializer
+from drf_yasg.utils import swagger_auto_schema
+from django.shortcuts import render, get_object_or_404
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from drf_yasg.utils import swagger_auto_schema
+from .models import Subscription
+from .serializers import SubscriptionSerializer
 
 
 class HomeView(ListView):
@@ -232,3 +248,37 @@ class GetSubcategoriesView(View):
         subcategories = Subcategory.objects.filter(category_id=category_id).values('id', 'name')
         return JsonResponse(list(subcategories), safe=False)
 
+
+class SubscriptionView(APIView):
+    """
+    View для создания и получения подписок пользователя.
+    """
+
+    @method_decorator(csrf_exempt)
+    @swagger_auto_schema(
+        request_body=SubscriptionSerializer,
+        responses={201: 'Подписка создана', 400: 'Ошибка валидации'}
+    )
+    def post(self, request):
+        """Создает новую подписку."""
+        data = request.data.copy()
+        data['user'] = request.user.id
+        serializer = SubscriptionSerializer(data=data)
+
+        if serializer.is_valid():
+            subscription = serializer.save()
+            return Response({'status': 'subscribed', 'subscription_id': subscription.id}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @swagger_auto_schema(
+        responses={200: SubscriptionSerializer(many=False)}
+    )
+    def get(self, request):
+        """Возвращает информацию о текущей подписке пользователя."""
+        subscription = get_object_or_404(Subscription, user=request.user)
+        serializer = SubscriptionSerializer(subscription)
+        return Response(serializer.data)
+
+    def get_template(self, request):
+        """Возвращает шаблон для управления подписками."""
+        return render(request, 'subscription.html')

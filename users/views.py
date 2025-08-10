@@ -77,6 +77,11 @@ def user_list(request):
     users = users.exclude(groups__name__in=['Post moderator group'])
     return render(request, "users/user_list.html", {"users": users})
 
+@login_required
+def user_profile_view(request, user_id):
+    """Просмотр профиля другого пользователя."""
+    user = get_object_or_404(CustomUser, id=user_id)
+    return render(request, "users/user_profile.html", {"user": user})
 
 def block_user(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)

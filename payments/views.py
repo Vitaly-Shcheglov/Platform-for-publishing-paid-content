@@ -5,13 +5,13 @@ from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from .models import Payment
 from posts.models import Post
-from courses.services import create_product, create_price, create_checkout_session
 from rest_framework import status
 import json
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 import stripe
+from .serializers import PaymentSerializer
 
 
 class PaymentListView(generics.ListAPIView):
@@ -79,13 +79,13 @@ class PaymentCreateView(APIView):
             user=request.user,
             amount=amount,
             payment_method='stripe',
-            is_subscription=is_subscription,,
+            is_subscription=is_subscription,
         )
 
         return Response({"url": session.url}, status=status.HTTP_201_CREATED)
 
 
-stripe.api_key = settings.STRIPE_SECRET_KEY
+stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
 
 @csrf_exempt
 def stripe_webhook(request):

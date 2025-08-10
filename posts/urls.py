@@ -16,6 +16,7 @@ from .views import (
     PostsPaidListView,
     CategoryListView,
     GetSubcategoriesView,
+    SubscriptionView
 )
 
 
@@ -34,4 +35,5 @@ urlpatterns = [
     path("category/<int:pk>/posts/", PostsInCategoryView.as_view(), name="posts_in_category"),
     path('categories/', CategoryListView.as_view(), name='category_list'),
     path('subcategories/', GetSubcategoriesView.as_view(),  name='get_subcategories'),
+    path('subscription/', SubscriptionView.as_view(), name='subscription'),
 ]
