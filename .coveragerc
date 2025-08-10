@@ -1,0 +1,16 @@
+[run]
+source = habits, notifications, subscriptions, users
+
+[report]
+omit =
+    */venv/*
+    */migrations/*
+    *\__init__.py*
+    *\admin.py*
+    *\apps.py*
+    *\forms.py*
+    *\permissions.py*
+    *\task.py*
+    *\tests.py*
+    *\urls.py*
+    *\views.py*
