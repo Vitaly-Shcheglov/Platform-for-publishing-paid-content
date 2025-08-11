@@ -21,10 +21,9 @@
         <label for="password">Пароль:</label>
         <input type="password" name="password" id="password" required>
     </div>
-    <button type="submit" class="btn btn-primary">Войти</button>  <!-- Кнопка для отправки формы -->
+    <button type="submit" class="btn btn-primary">Войти</button>
     <a href="{% url 'profile' %}" class="btn btn-link">Мой профиль</a>
     <a href="{% url 'password_reset' %}">Забыли пароль?</a>
-    <a href="{% url 'register' %}" class="btn btn-link">Регистрация</a>
     <a href="{% url 'home' %}" class="btn btn-secondary">Вернуться на главную</a>
 </form>
 

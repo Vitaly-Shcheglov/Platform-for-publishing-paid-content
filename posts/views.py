@@ -315,4 +315,4 @@ def subscription_view(request):
 
 def subscription_success_view(request):
     """Страница успеха после подписки."""
-    return render(request, "users/subscription_success.html")
+    return render(request, "subscription_success.html")

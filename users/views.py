@@ -105,11 +105,8 @@ def is_post_manager(user):
     return user.groups.filter(name="Post moderator group").exists()
 
 @login_required
-@user_passes_test(is_post_manager)
-def user_list(request):
-    users = CustomUser.objects.exclude(is_superuser=True)
-    users = users.exclude(groups__name__in=['Post moderator group'])
-    return render(request, "users/user_list.html", {"users": users})
+def profile_view(request):
+    return render(request, "users/profile.html", {"user": request.user})
 
 @login_required
 def user_profile_view(request, user_id):
@@ -164,6 +161,17 @@ def login_view(request):
             messages.error(request, "Неверные учетные данные.")
 
     return render(request, "users/login.html")
+
+@login_required
+def profile_edit(request):
+    if request.method == "POST":
+        form = UserProfileForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect("profile")
+    else:
+        form = UserProfileForm(instance=request.user)
+    return render(request, "users/profile_edit.html", {"form": form})
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
