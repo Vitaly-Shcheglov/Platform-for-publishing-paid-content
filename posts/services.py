@@ -1,5 +1,6 @@
 from django.core.cache import cache
 from .models import Post
+import stripe
 
 
 class PostService:
@@ -11,6 +12,6 @@ class PostService:
 
         if posts is None:
             posts = Post.objects.filter(category_id=category_id)
-            cache.set(cache_key, posts, 60 * 15)  # Кешируем на 15 минут
+            cache.set(cache_key, posts, 60 * 15)
 
         return posts

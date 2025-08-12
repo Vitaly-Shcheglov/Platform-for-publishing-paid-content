@@ -4,7 +4,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from .models import Payment
-from posts.models import Post
 from rest_framework import status
 import json
 from django.http import HttpResponse
@@ -40,7 +39,7 @@ class PaymentListView(generics.ListAPIView):
         payment_method = self.request.query_params.get('payment_method', None)
 
         if post_id_id:
-            queryset = queryset.filter(paid_post_id=course_id)
+            queryset = queryset.filter(paid_post_id=post_id)
         if payment_method:
             queryset = queryset.filter(payment_method=payment_method)
 
@@ -48,30 +47,19 @@ class PaymentListView(generics.ListAPIView):
 
 
 class PaymentCreateView(APIView):
-    """
-    View для создания платежа.
-
-    Позволяет пользователю создать платеж за пост, создавая продукт и цену в Stripe,
-    а также сессию для получения ссылки на оплату.
-    """
-
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        """
-        Обрабатывает создание платежа.
-
-        Args:
-            request (Request): Объект запроса с данными о платеже.
-
-        Returns:
-            Response: Ответ с информацией о платежной сессии.
-        """
         amount = request.data.get('amount')
         is_subscription = request.data.get('is_subscription', False)
+        subscription_type = request.data.get('subscription_type')  # 'basic' или 'premium'
 
-        product = create_product(course.title, course.description)
-        price = create_price(product.id, int(course.price * 100))
+        if subscription_type == 'basic':
+            price = create_price('prod_existing_id', 500)  # 5.00 USD
+        elif subscription_type == 'premium':
+            price = create_price('prod_existing_id', 1000)  # 10.00 USD
+        else:
+            return Response({"error": "Invalid subscription type"}, status=status.HTTP_400_BAD_REQUEST)
 
         session = create_checkout_session(price.id)
 
@@ -79,7 +67,7 @@ class PaymentCreateView(APIView):
             user=request.user,
             amount=amount,
             payment_method='stripe',
-            is_subscription=is_subscription,
+            is_subscription=True,
         )
 
         return Response({"url": session.url}, status=status.HTTP_201_CREATED)

@@ -3,13 +3,14 @@ from django.utils import timezone
 from users.models import CustomUser
 from posts.models import Post
 from django.test import TestCase
-from .models import CustomUser, Payment
+from users.models import CustomUser
 from .serializers import PaymentSerializer
 from unittest.mock import patch
 from .services import create_product, create_price, create_checkout_session, create_subscription
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
+from .models import Payment
 
 
 class PaymentModelTest(TestCase):
