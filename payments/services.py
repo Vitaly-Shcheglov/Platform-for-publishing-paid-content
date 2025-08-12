@@ -12,7 +12,7 @@ def create_product(name, description):
         description (str): Описание продукта.
 
     Returns:
-        dict: Ответ от Stripe о создании продукта.
+        dict: Ответ от Stripe о создании продукта, содержащий информацию о продукте, включая его ID.
     """
     product = stripe.Product.create(
         name=name,
@@ -26,11 +26,11 @@ def create_price(product_id, amount, currency="usd"):
 
     Args:
         product_id (str): ID продукта, для которого создается цена.
-        amount (int): Сумма в копейках.
+        amount (int): Сумма в копейках (например, 1000 для 10.00 USD).
         currency (str): Валюта (по умолчанию 'usd').
 
     Returns:
-        dict: Ответ от Stripe о создании цены.
+        dict: Ответ от Stripe о создании цены, содержащий информацию о цене, включая её ID.
     """
     price = stripe.Price.create(
         unit_amount=amount,
@@ -47,7 +47,7 @@ def create_checkout_session(price_id):
         price_id (str): ID цены, соответствующей продукту.
 
     Returns:
-        dict: Ответ от Stripe с URL для оплаты.
+        dict: Ответ от Stripe с URL для оплаты и информацией о сессии.
     """
     session = stripe.checkout.Session.create(
         payment_method_types=["card"],
@@ -68,11 +68,11 @@ def create_subscription(user, amount):
     Создает разовую подписку для пользователя.
 
     Args:
-        user: Объект пользователя, который будет подписан.
-        amount (int): Сумма подписки в копейках.
+        user (Any): Объект пользователя, который будет подписан.
+        amount (int): Сумма подписки в копейках (например, 1000 для 10.00 USD).
 
     Returns:
-        dict: Ответ от Stripe с URL для оплаты.
+        dict: Ответ от Stripe с URL для оплаты и информацией о сессии подписки.
     """
 
     product = create_product(name="Разовая подписка", description="Оплата за разовую подписку")

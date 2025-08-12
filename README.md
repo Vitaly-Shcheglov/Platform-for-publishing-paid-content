@@ -273,7 +273,7 @@ DATABASE_URL=postgres://user:password@db:5432/dbname
 Просмотр доступных маршрутов:
 - python manage.py show_urls (если установлен django-extensions или аналог)
 Тестирование API через curl:
-- curl -i http://127.0.0.1:8000/api/auth/token/ (для получение токена)
+- curl -i http://127.0.0.1:8000/api/auth/token/ (для получение токена).
 - curl -H "Authorization: Bearer <token>" http://127.0.0.1:8000/api/ваш-эндпойнт/
 Тестирование с Postman/Insomnia: импортируйте OpenAPI/Swagger, если включено.
 

@@ -21,6 +21,16 @@ FORBIDDEN_WORDS = [
 
 
 class PostForm(forms.ModelForm):
+    """
+    Форма для создания и редактирования постов.
+
+    Позволяет пользователям вводить данные для создания или редактирования поста,
+    включая заголовок, содержание, категорию, подкатегорию и изображение.
+    Также выполняет валидацию данных.
+
+    Атрибуты:
+        Meta (class): Внутренний класс, который определяет модель и поля формы.
+    """
     class Meta:
         model = Post
         fields = ['title', 'content', 'category', 'subcategory', 'is_paid', 'image']
@@ -28,19 +38,53 @@ class PostForm(forms.ModelForm):
             'content': forms.Textarea(attrs={'rows': 10}),
         }
 
-    def clean_name(self):
-        name = self.cleaned_data["name"]
-        if any(word in name.lower() for word in FORBIDDEN_WORDS):
-            raise ValidationError("Название записи содержит запрещенные слова.")
-        return name
+    def clean_title(self):
+        """
+        Проверяет заголовок поста на наличие запрещенных слов.
 
-    def clean_description(self):
-        description = self.cleaned_data["description"]
-        if any(word in description.lower() for word in FORBIDDEN_WORDS):
+        Args:
+            None
+
+        Returns:
+            str: Проверенный заголовок, если он валиден.
+
+        Raises:
+            ValidationError: Если заголовок содержит запрещенные слова.
+        """
+        title = self.cleaned_data["title"]
+        if any(word in title.lower() for word in FORBIDDEN_WORDS):
+            raise ValidationError("Название записи содержит запрещенные слова.")
+        return title
+
+    def clean_content(self):
+        """
+        Проверяет содержание поста на наличие запрещенных слов.
+
+        Args:
+            None
+
+        Returns:
+            str: Проверенное содержание, если оно валидно.
+
+        Raises:
+            ValidationError: Если содержание содержит запрещенные слова.
+        """
+        content = self.cleaned_data["content"]
+        if any(word in content.lower() for word in FORBIDDEN_WORDS):
             raise ValidationError("Запись содержит запрещенные слова.")
-        return description
+        return content
 
     def __init__(self, *args, **kwargs):
+        """
+        Инициализирует форму и настраивает доступные подкатегории в зависимости от выбранной категории.
+
+        Args:
+            *args: Позиционные аргументы.
+            **kwargs: Именованные аргументы.
+
+        Returns:
+            None
+        """
         super(PostForm, self).__init__(*args, **kwargs)
         self.fields['category'].queryset = Category.objects.all()
         self.fields['subcategory'].queryset = Subcategory.objects.none()
@@ -56,6 +100,15 @@ class PostForm(forms.ModelForm):
 
 
 class SubscriptionForm(forms.ModelForm):
+    """
+    Форма для создания и редактирования подписок.
+
+    Позволяет пользователям вводить данные для создания или редактирования подписки,
+    включая план и дату окончания подписки.
+
+    Атрибуты:
+        Meta (class): Внутренний класс, который определяет модель и поля формы.
+    """
     class Meta:
         model = Subscription
         fields = ['plan', 'end_date']
