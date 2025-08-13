@@ -104,7 +104,9 @@ class PostForm(forms.ModelForm):
         model = Post
         fields = ["title", "content", "category", "subcategory", "is_paid", "image"]
         widgets = {
-            "content": forms.Textarea(attrs={"rows": 10}),
+            'title': forms.TextInput(attrs={'id': 'id_title'}),
+            'content': forms.Textarea(attrs={'id': 'id_content'}),
+            'image': forms.FileInput(attrs={'id': 'id_image'}),
         }
 
     def clean_title(self):

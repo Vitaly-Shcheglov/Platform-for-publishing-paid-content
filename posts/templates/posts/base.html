@@ -6,30 +6,13 @@
     <title>{% block title %}Контент Платформа{% endblock %}</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-     <style>
-        body {
-            background-color: #f0f8ff; /* Светлый фон */
-            color: #333; /* Темный текст */
-        }
-        h1 {
-            color: #6c63ff; /* Цвет заголовка */
-        }
-        .btn-primary {
-            background-color: #6c63ff; /* Цвет кнопки */
-            border: none;
-        }
-        .btn-primary:hover {
-            background-color: #5a52e0; /* Цвет кнопки при наведении */
-        }
-        footer {
-            background-color: #f8f9fa; /* Цвет футера */
-            color: #333;
-        }
-    </style>
 </head>
 <body>
 
-    <main>
+    <header>
+        {% include "posts/menu.html" %}
+    </header>
+     <main>
         {% block content %}{% endblock %}
     </main>
     <footer>

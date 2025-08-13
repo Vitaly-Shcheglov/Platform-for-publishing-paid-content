@@ -69,12 +69,7 @@
 
 <div class="container">
     <div class="row text-center mt-4">
-        <div class="col-12">
-            <h4>Публикации</h4>
-        </div>
-    </div>
-
-    <div class="row">
+        <h4>Публикации</h4>
         {% for post in posts %}
             <div class="col-3">
                 <div class="post-card card mb-4 box-shadow">
@@ -89,11 +84,15 @@
                 </div>
             </div>
         {% empty %}
-            <div class="col-12">
-                <p>Нет доступных публикаций</p>
-            </div>
+            <p>Нет доступных публикаций</p>
         {% endfor %}
     </div>
+
+    <div>
+       {% for post in posts %}
+
+       {% endfor %}
+   </div>
 
     <div class="pagination">
         {% if page_obj.has_previous %}
