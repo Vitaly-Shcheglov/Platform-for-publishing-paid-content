@@ -1,8 +1,7 @@
-from django.db import models
 from django.conf import settings
-from django.utils import timezone
 from django.contrib.auth import get_user_model
-
+from django.db import models
+from django.utils import timezone
 
 User = get_user_model()
 
@@ -19,14 +18,11 @@ class Category(models.Model):
         description (str): Описание категории (необязательное поле).
         parent (ForeignKey): Ссылка на родительскую категорию (если есть).
     """
+
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     parent = models.ForeignKey(
-        'self',
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
-        related_name='child_categories'
+        "self", on_delete=models.CASCADE, blank=True, null=True, related_name="child_categories"
     )
 
     class Meta:
@@ -54,8 +50,9 @@ class Subcategory(models.Model):
         name (str): Название подкатегории.
         category (ForeignKey): Ссылка на основную категорию, к которой принадлежит подкатегория.
     """
+
     name = models.CharField(max_length=255)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='subcategories')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="subcategories")
 
     class Meta:
         verbose_name = "Подкатегория"
@@ -92,23 +89,20 @@ class Post(models.Model):
         is_paid (bool): Указывает, является ли пост платным.
         image (ImageField): Изображение, связанное с постом (необязательное поле).
     """
+
     title = models.CharField(max_length=255)
     content = models.TextField()
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='posts')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="posts")
     subcategory = models.ForeignKey(
-        Subcategory,
-        on_delete=models.CASCADE,
-        related_name='post_subcategories',
-        null=True,
-        blank=True
+        Subcategory, on_delete=models.CASCADE, related_name="post_subcategories", null=True, blank=True
     )
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='owned_posts')
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="owned_posts")
     is_published = models.BooleanField(default=False)
     is_paid = models.BooleanField(default=False)
-    image = models.ImageField(upload_to='uploads/', null=True, blank=True)
+    image = models.ImageField(upload_to="uploads/", null=True, blank=True)
 
     class Meta:
         """
@@ -122,6 +116,7 @@ class Post(models.Model):
             verbose_name_plural (str): Человекочитаемое имя модели во множественном числе.
             permissions (tuple): Кортеж разрешений, связанных с моделью.
         """
+
         verbose_name = "Запись"
         verbose_name_plural = "Записи"
         permissions = (
@@ -154,6 +149,7 @@ class Subscription(models.Model):
         is_active (bool): Флаг, указывающий, является ли подписка активной.
                           По умолчанию - False.
     """
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     plan = models.CharField(max_length=50)  # Например, 'basic' или 'premium'
     start_date = models.DateTimeField(auto_now_add=True)

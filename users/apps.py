@@ -14,5 +14,6 @@ class UsersConfig(AppConfig):
                                       используемого в моделях приложения.
         name (str): Имя приложения, которое будет использоваться в Django.
     """
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'users'
+
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "users"

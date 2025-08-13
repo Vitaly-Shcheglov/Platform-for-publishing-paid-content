@@ -1,13 +1,13 @@
-from django.test import TestCase
-from .models import Subscription
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
-from .services import PostService
+from django.test import TestCase
 from django.urls import reverse
-from .models import Post, CustomUser, Category, Subcategory
 
+from .models import Category, Post, Subcategory, Subscription
+from .services import PostService
 
 User = get_user_model()
+
 
 class CategoryModelTest(TestCase):
     """
@@ -15,6 +15,7 @@ class CategoryModelTest(TestCase):
 
     Этот класс содержит тесты, которые проверяют функциональность и целостность модели Category.
     """
+
     def setUp(self):
         """
         Настраивает тестовые данные перед выполнением каждого теста.
@@ -31,12 +32,14 @@ class CategoryModelTest(TestCase):
         """
         self.assertEqual(str(self.category), "Test Category")
 
+
 class SubcategoryModelTest(TestCase):
     """
     Тесты для модели Subcategory.
 
     Этот класс содержит тесты, которые проверяют функциональность и целостность модели Subcategory.
     """
+
     def setUp(self):
         """
         Настраивает тестовые данные перед выполнением каждого теста.
@@ -54,19 +57,21 @@ class SubcategoryModelTest(TestCase):
         """
         self.assertEqual(str(self.subcategory), "Test Subcategory")
 
+
 class PostModelTest(TestCase):
     """
     Тесты для модели Post.
 
     Этот класс содержит тесты, которые проверяют функциональность и целостность модели Post.
     """
+
     def setUp(self):
         """
         Настраивает тестовые данные перед выполнением каждого теста.
 
         Создает тестового пользователя, категорию и пост для использования в тестах.
         """
-        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.user = User.objects.create_user(username="testuser", password="testpass")
         self.category = Category.objects.create(name="Test Category")
         self.post = Post.objects.create(
             title="Test Post",
@@ -74,7 +79,7 @@ class PostModelTest(TestCase):
             category=self.category,
             author=self.user,
             is_published=True,
-            is_paid=False
+            is_paid=False,
         )
 
     def test_str(self):
@@ -85,24 +90,23 @@ class PostModelTest(TestCase):
         """
         self.assertEqual(str(self.post), "Test Post")
 
+
 class SubscriptionModelTest(TestCase):
     """
     Тесты для модели Subscription.
 
     Этот класс содержит тесты, которые проверяют функциональность и целостность модели Subscription.
     """
+
     def setUp(self):
         """
         Настраивает тестовые данные перед выполнением каждого теста.
 
         Создает тестового пользователя и подписку для использования в тестах.
         """
-        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.user = User.objects.create_user(username="testuser", password="testpass")
         self.subscription = Subscription.objects.create(
-            user=self.user,
-            plan='basic',
-            end_date='2025-12-31',
-            is_active=True
+            user=self.user, plan="basic", end_date="2025-12-31", is_active=True
         )
 
     def test_str(self):
@@ -139,6 +143,7 @@ class PostServiceTest(TestCase):
     Этот класс содержит тесты, которые проверяют функциональность методов класса PostService,
     включая получение постов по категории с кэшированием.
     """
+
     def setUp(self):
         """
         Настраивает тестовые данные перед выполнением каждого теста.
@@ -168,7 +173,6 @@ class PostServiceTest(TestCase):
         self.assertEqual(len(posts), 2)
         self.assertEqual(posts[0].title, "Post 1")
         self.assertEqual(posts[1].title, "Post 2")
-
 
         cached_posts = cache.get(f"poss_in_category_{self.category_id}")
         self.assertIsNotNone(cached_posts)
@@ -208,22 +212,23 @@ class HomeViewTest(TestCase):
     Этот класс содержит тесты, которые проверяют функциональность домашней страницы
     и отображение постов.
     """
+
     def setUp(self):
         """
         Настраивает тестовые данные перед выполнением каждого теста.
 
         Создает тестового пользователя, категорию и пост для использования в тестах.
         """
-        self.user = User.objects.create_user(username='testuser', password='testpass')
-        self.category = Category.objects.create(name='Test Category')
-        self.subcategory = Subcategory.objects.create(name='Test Subcategory', category=self.category)
+        self.user = User.objects.create_user(username="testuser", password="testpass")
+        self.category = Category.objects.create(name="Test Category")
+        self.subcategory = Subcategory.objects.create(name="Test Subcategory", category=self.category)
         self.post = Post.objects.create(
-            title='Test Post',
-            content='This is a test post.',
+            title="Test Post",
+            content="This is a test post.",
             category=self.category,
             subcategory=self.subcategory,
             author=self.user,
-            is_published=True
+            is_published=True,
         )
 
     def test_home_view(self):
@@ -233,10 +238,11 @@ class HomeViewTest(TestCase):
         Проверяет, что домашняя страница возвращает статус 200 и
         использует правильный шаблон, а также содержит необходимый контент.
         """
-        response = self.client.get(reverse('home'))
+        response = self.client.get(reverse("home"))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'posts/home.html')
-        self.assertContains(response, 'Test Post')
+        self.assertTemplateUsed(response, "posts/home.html")
+        self.assertContains(response, "Test Post")
+
 
 class ContactViewTest(TestCase):
     """
@@ -244,6 +250,7 @@ class ContactViewTest(TestCase):
 
     Этот класс содержит тесты, которые проверяют функциональность страницы контактов.
     """
+
     def test_contact_view_get(self):
         """
         Тест для проверки GET-запроса на страницу контактов.
@@ -251,9 +258,9 @@ class ContactViewTest(TestCase):
         Проверяет, что страница контактов возвращает статус 200 и
         использует правильный шаблон.
         """
-        response = self.client.get(reverse('contact'))
+        response = self.client.get(reverse("contact"))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'posts/contacts.html')
+        self.assertTemplateUsed(response, "posts/contacts.html")
 
     def test_contact_view_post_success(self):
         """
@@ -261,11 +268,9 @@ class ContactViewTest(TestCase):
 
         Проверяет, что сообщение успешно отправляется, когда все поля заполнены.
         """
-        response = self.client.post(reverse('contact'), {
-            'name': 'John Doe',
-            'phone': '1234567890',
-            'message': 'Hello!'
-        })
+        response = self.client.post(
+            reverse("contact"), {"name": "John Doe", "phone": "1234567890", "message": "Hello!"}
+        )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Спасибо, John Doe! Ваше сообщение получено.")
 
@@ -275,13 +280,10 @@ class ContactViewTest(TestCase):
 
         Проверяет, что возвращается ошибка, если обязательные поля не заполнены.
         """
-        response = self.client.post(reverse('contact'), {
-            'name': '',
-            'phone': '',
-            'message': ''
-        })
+        response = self.client.post(reverse("contact"), {"name": "", "phone": "", "message": ""})
         self.assertEqual(response.status_code, 400)
         self.assertContains(response, "Пожалуйста, заполните все поля!")
+
 
 class PostDetailViewTest(TestCase):
     """
@@ -289,22 +291,23 @@ class PostDetailViewTest(TestCase):
 
     Этот класс содержит тесты, которые проверяют функциональность страницы деталей поста.
     """
+
     def setUp(self):
         """
         Настраивает тестовые данные перед выполнением каждого теста.
 
         Создает тестового пользователя, категорию, подкатегорию и пост для использования в тестах.
         """
-        self.user = User.objects.create_user(username='testuser', password='testpass')
-        self.category = Category.objects.create(name='Test Category')
-        self.subcategory = Subcategory.objects.create(name='Test Subcategory', category=self.category)
+        self.user = User.objects.create_user(username="testuser", password="testpass")
+        self.category = Category.objects.create(name="Test Category")
+        self.subcategory = Subcategory.objects.create(name="Test Subcategory", category=self.category)
         self.post = Post.objects.create(
-            title='Test Post',
-            content='This is a test post.',
+            title="Test Post",
+            content="This is a test post.",
             category=self.category,
             subcategory=self.subcategory,
             author=self.user,
-            is_published=True
+            is_published=True,
         )
 
     def test_post_detail_view(self):
@@ -314,11 +317,12 @@ class PostDetailViewTest(TestCase):
         Проверяет, что страница деталей поста возвращает статус 200 и
         использует правильный шаблон, а также содержит необходимый контент.
         """
-        self.client.login(username='testuser', password='testpass')
-        response = self.client.get(reverse('post_detail', args=[self.post.id]))
+        self.client.login(username="testuser", password="testpass")
+        response = self.client.get(reverse("post_detail", args=[self.post.id]))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'posts/post_detail.html')
-        self.assertContains(response, 'Test Post')
+        self.assertTemplateUsed(response, "posts/post_detail.html")
+        self.assertContains(response, "Test Post")
+
 
 class AddPostViewTest(TestCase):
     """
@@ -327,15 +331,16 @@ class AddPostViewTest(TestCase):
     Этот класс содержит тесты, которые проверяют функциональность представления,
     позволяющего пользователям добавлять новые посты.
     """
+
     def setUp(self):
         """
         Настраивает тестовые данные перед выполнением каждого теста.
 
         Создает тестового пользователя, категорию и подкатегорию для использования в тестах.
         """
-        self.user = User.objects.create_user(username='testuser', password='testpass')
-        self.category = Category.objects.create(name='Test Category')
-        self.subcategory = Subcategory.objects.create(name='Test Subcategory', category=self.category)
+        self.user = User.objects.create_user(username="testuser", password="testpass")
+        self.category = Category.objects.create(name="Test Category")
+        self.subcategory = Subcategory.objects.create(name="Test Subcategory", category=self.category)
 
     def test_add_post_view(self):
         """
@@ -347,16 +352,20 @@ class AddPostViewTest(TestCase):
         Returns:
             None
         """
-        self.client.login(username='testuser', password='testpass')
-        response = self.client.post(reverse('add_post'), {
-            'title': 'New Test Post',
-            'content': 'Content of the new post.',
-            'category': self.category.id,
-            'subcategory': self.subcategory.id,
-            'is_paid': False
-        })
+        self.client.login(username="testuser", password="testpass")
+        response = self.client.post(
+            reverse("add_post"),
+            {
+                "title": "New Test Post",
+                "content": "Content of the new post.",
+                "category": self.category.id,
+                "subcategory": self.subcategory.id,
+                "is_paid": False,
+            },
+        )
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(Post.objects.filter(title='New Test Post').exists())
+        self.assertTrue(Post.objects.filter(title="New Test Post").exists())
+
 
 class PostUpdateViewTest(TestCase):
     """
@@ -365,22 +374,23 @@ class PostUpdateViewTest(TestCase):
     Этот класс содержит тесты, которые проверяют функциональность представления,
     позволяющего пользователям обновлять существующие посты.
     """
+
     def setUp(self):
         """
         Настраивает тестовые данные перед выполнением каждого теста.
 
         Создает тестового пользователя, категорию, подкатегорию и пост для использования в тестах.
         """
-        self.user = User.objects.create_user(username='testuser', password='testpass')
-        self.category = Category.objects.create(name='Test Category')
-        self.subcategory = Subcategory.objects.create(name='Test Subcategory', category=self.category)
+        self.user = User.objects.create_user(username="testuser", password="testpass")
+        self.category = Category.objects.create(name="Test Category")
+        self.subcategory = Subcategory.objects.create(name="Test Subcategory", category=self.category)
         self.post = Post.objects.create(
-            title='Test Post',
-            content='This is a test post.',
+            title="Test Post",
+            content="This is a test post.",
             category=self.category,
             subcategory=self.subcategory,
             author=self.user,
-            is_published=True
+            is_published=True,
         )
 
     def test_post_update_view(self):
@@ -393,14 +403,17 @@ class PostUpdateViewTest(TestCase):
         Returns:
             None
         """
-        self.client.login(username='testuser', password='testpass')
-        response = self.client.post(reverse('post_update', args=[self.post.id]), {
-            'title': 'Updated Test Post',
-            'content': 'Updated content.',
-            'category': self.category.id,
-            'subcategory': self.subcategory.id,
-            'is_paid': False
-        })
+        self.client.login(username="testuser", password="testpass")
+        response = self.client.post(
+            reverse("post_update", args=[self.post.id]),
+            {
+                "title": "Updated Test Post",
+                "content": "Updated content.",
+                "category": self.category.id,
+                "subcategory": self.subcategory.id,
+                "is_paid": False,
+            },
+        )
         self.assertEqual(response.status_code, 302)
         self.post.refresh_from_db()
-        self.assertEqual(self.post.title, 'Updated Test Post')
+        self.assertEqual(self.post.title, "Updated Test Post")

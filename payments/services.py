@@ -3,6 +3,7 @@ from django.conf import settings
 
 stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
 
+
 def create_product(name, description):
     """
     Создает продукт в Stripe.
@@ -19,6 +20,7 @@ def create_product(name, description):
         description=description,
     )
     return product
+
 
 def create_price(product_id, amount, currency="usd"):
     """
@@ -38,6 +40,7 @@ def create_price(product_id, amount, currency="usd"):
         product=product_id,
     )
     return price
+
 
 def create_checkout_session(price_id):
     """
@@ -63,6 +66,7 @@ def create_checkout_session(price_id):
     )
     return session
 
+
 def create_subscription(user, amount):
     """
     Создает разовую подписку для пользователя.
@@ -77,7 +81,6 @@ def create_subscription(user, amount):
 
     product = create_product(name="Разовая подписка", description="Оплата за разовую подписку")
     price = create_price(product.id, amount)
-
 
     session = create_checkout_session(price.id)
     return session

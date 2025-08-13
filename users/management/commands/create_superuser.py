@@ -1,5 +1,7 @@
 from django.core.management import BaseCommand
+
 from users.models import CustomUser
+
 
 class Command(BaseCommand):
     """
@@ -28,7 +30,7 @@ class Command(BaseCommand):
         """
         user = CustomUser.objects.create(
             phone_number="01234567890",  # Замените на фактический phone_number зарегистрированного пользователя
-            email="test@example.com" # Замените на фактический email зарегистрированного пользователя
+            email="test@example.com",  # Замените на фактический email зарегистрированного пользователя
         )
         user.set_password("test")
         user.is_active = True
@@ -36,4 +38,4 @@ class Command(BaseCommand):
         user.is_superuser = True
         user.save()
 
-        self.stdout.write(self.style.SUCCESS('Суперпользователь успешно создан.'))
+        self.stdout.write(self.style.SUCCESS("Суперпользователь успешно создан."))

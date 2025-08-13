@@ -13,5 +13,6 @@ class PostsConfig(AppConfig):
         default_auto_field (str): Тип поля по умолчанию для автоматического увеличения идентификаторов.
         name (str): Имя приложения, которое будет использоваться в Django.
     """
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'posts'
+
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "posts"

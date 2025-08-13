@@ -7,20 +7,25 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Payment',
+            name="Payment",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('payment_date', models.DateTimeField(auto_now_add=True)),
-                ('amount', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('payment_method', models.CharField(choices=[('cash', 'Наличные'), ('transfer', 'Перевод на счет'), ('stripe', 'Stripe')], max_length=10)),
-                ('is_subscription', models.BooleanField(default=False)),
-                ('stripe_payment_intent_id', models.CharField(max_length=255, unique=True)),
-                ('status', models.CharField(default='pending', max_length=50)),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("payment_date", models.DateTimeField(auto_now_add=True)),
+                ("amount", models.DecimalField(decimal_places=2, max_digits=10)),
+                (
+                    "payment_method",
+                    models.CharField(
+                        choices=[("cash", "Наличные"), ("transfer", "Перевод на счет"), ("stripe", "Stripe")],
+                        max_length=10,
+                    ),
+                ),
+                ("is_subscription", models.BooleanField(default=False)),
+                ("stripe_payment_intent_id", models.CharField(max_length=255, unique=True)),
+                ("status", models.CharField(default="pending", max_length=50)),
             ],
         ),
     ]

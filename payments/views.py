@@ -1,13 +1,13 @@
-from rest_framework import generics
+import stripe
+from django.conf import settings
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
 from .models import Payment
-from rest_framework import status
-from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.conf import settings
-import stripe
 from .serializers import PaymentSerializer
 
 
@@ -24,33 +24,36 @@ class PaymentListView(generics.ListAPIView):
         serializer_class (Serializer): Сериализатор, который используется для представления данных Payment.
         permission_classes (list): Список разрешений, определяющих доступ к представлению.
     """
-    queryset = Payment.objects.all()
-    serializer_class = PaymentSerializer
-    permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        """
-        Возвращает отфильтрованный список платежей на основе параметров запроса.
 
-        Этот метод позволяет фильтровать платежи по ID поста и методу оплаты,
-        если соответствующие параметры переданы в запросе.
+queryset = Payment.objects.all()
+serializer_class = PaymentSerializer
+permission_classes = [IsAuthenticated]
 
-        Args:
-            None
 
-        Returns:
-            QuerySet: Отфильтрованный список платежей, соответствующих параметрам запроса.
-        """
-        queryset = super().get_queryset()
-        post_id = self.request.query_params.get('post_id', None)
-        payment_method = self.request.query_params.get('payment_method', None)
+def get_queryset(self):
+    """
+    Возвращает отфильтрованный список платежей на основе параметров запроса.
 
-        if post_id_id:
-            queryset = queryset.filter(paid_post_id=post_id)
-        if payment_method:
-            queryset = queryset.filter(payment_method=payment_method)
+    Этот метод позволяет фильтровать платежи по ID поста и методу оплаты,
+    если соответствующие параметры переданы в запросе.
 
-        return queryset
+    Args:
+        None
+
+    Returns:
+        QuerySet: Отфильтрованный список платежей, соответствующих параметрам запроса.
+    """
+    queryset = super().get_queryset()
+    post_id = self.request.query_params.get("post_id", None)
+    payment_method = self.request.query_params.get("payment_method", None)
+
+    if post_id:
+        queryset = queryset.filter(paid_post_id=post_id)
+    if payment_method:
+        queryset = queryset.filter(payment_method=payment_method)
+
+    return queryset
 
 
 class PaymentCreateView(APIView):
@@ -63,48 +66,93 @@ class PaymentCreateView(APIView):
     Атрибуты:
         permission_classes (list): Список разрешений, определяющих доступ к представлению.
     """
-    permission_classes = [IsAuthenticated]
 
-    def post(self, request, *args, **kwargs):
-        """
-        Обрабатывает создание платежа.
 
-        Этот метод ожидает, что в запросе будут переданы данные о платеже,
-        такие как сумма, тип подписки и идентификатор поста.
+permission_classes = [IsAuthenticated]
 
-            Args:
-            request (Request): Объект запроса с данными о платеже.
-            *args: Дополнительные аргументы (не используются).
-            **kwargs: Дополнительные именованные аргументы (не используются).
 
-        Returns:
-            Response: Ответ с информацией о сессии для оплаты.
-                Если данные некорректны, возвращает ошибку с соответствующим статусом.
-        """
-        amount = request.data.get('amount')
-        is_subscription = request.data.get('is_subscription', False)
-        subscription_type = request.data.get('subscription_type')  # 'basic' или 'premium'
+@staticmethod
+def create_price(product_id, amount):
+    """
+    Создает объект цены для указанных параметров.
 
-        if subscription_type == 'basic':
-            price = create_price('prod_existing_id', 500)  # 5.00 USD
-        elif subscription_type == 'premium':
-            price = create_price('prod_existing_id', 1000)  # 10.00 USD
-        else:
-            return Response({"error": "Invalid subscription type"}, status=status.HTTP_400_BAD_REQUEST)
+    Args:
+        product_id (str): Идентификатор продукта.
+        amount (int): Сумма в центах.
 
-        session = create_checkout_session(price.id)
+    Returns:
+        Price: Объект с информацией о цене.
+    """
+    price = stripe.Price.create(
+        unit_amount=amount,
+        currency="usd",
+        product=product_id,
+    )
+    return price
 
-        Payment.objects.create(
-            user=request.user,
-            amount=amount,
-            payment_method='stripe',
-            is_subscription=True,
-        )
 
-        return Response({"url": session.url}, status=status.HTTP_201_CREATED)
+@staticmethod
+def create_checkout_session(price_id):
+    """
+    Создает сессию для оплаты с использованием указанного идентификатора цены.
+
+    Args:
+        price_id (str): Идентификатор цены.
+
+    Returns:
+        Session: Объект с URL для перехода на страницу оплаты.
+    """
+    session = stripe.checkout.Session.create(
+        mode="payment",
+        line_items=[{"price": price_id, "quantity": 1}],
+        success_url="https://yourdomain.com/success",
+        cancel_url="https://yourdomain.com/cancel",
+    )
+    return session
+
+
+def post(self, request, *args, **kwargs):
+    """
+    Обрабатывает создание платежа.
+
+    Этот метод ожидает, что в запросе будут переданы данные о платеже,
+    такие как сумма и тип подписки.
+
+    Args:
+        request (Request): Объект запроса с данными о платеже.
+        *args: Дополнительные аргументы (не используются).
+        **kwargs: Дополнительные именованные аргументы (не используются).
+
+    Returns:
+        Response: Ответ с информацией о сессии для оплаты.
+            Если данные некорректны, возвращает ошибку с соответствующим статусом.
+    """
+    amount = request.data.get("amount")
+    subscription_type = request.data.get("subscription_type")  # 'basic' или 'premium'
+
+    if subscription_type == "basic":
+        price = self.create_price("prod_basic_id", 500)  # 5.00 USD
+    elif subscription_type == "premium":
+        price = self.create_price("prod_premium_id", 1000)  # 10.00 USD
+    else:
+        return Response({"error": "Invalid subscription type"}, status=status.HTTP_400_BAD_REQUEST)
+
+    session = self.create_checkout_session(price.id)
+
+    Payment.objects.create(
+        user=request.user,
+        amount=amount,
+        payment_method="stripe",
+        is_subscription=True,
+        stripe_price_id=price.id,
+        stripe_checkout_session_id=session.id,
+    )
+
+    return Response({"url": session.url}, status=status.HTTP_201_CREATED)
 
 
 stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
+
 
 @csrf_exempt
 def stripe_webhook(request):
@@ -120,38 +168,35 @@ def stripe_webhook(request):
 
     Returns:
         HttpResponse: Возвращает HTTP ответ с кодом 200 в случае успешной обработки,
-                        или код 400 в случае ошибок валидации или подписи.
+                      или код 400 в случае ошибок валидации или подписи.
     """
     payload = request.body
-    sig_header = request.META['HTTP_STRIPE_SIGNATURE']
+    sig_header = request.META.get("HTTP_STRIPE_SIGNATURE", "")
     event = None
 
     try:
-        event = stripe.Webhook.construct_event(
-            payload, sig_header, settings.STRIPE_ENDPOINT_SECRET
-        )
-    except ValueError as e:
+        event = stripe.Webhook.construct_event(payload, sig_header, settings.STRIPE_ENDPOINT_SECRET)
+    except ValueError:
         return HttpResponse(status=400)
-    except stripe.error.SignatureVerificationError as e:
+    except stripe.error.SignatureVerificationError:
         return HttpResponse(status=400)
 
-    if event['type'] == 'payment_intent.succeeded':
-        payment_intent = event['data']['object']
-        payment_id = payment_intent['id']
-        amount_received = payment_intent['amount_received'] / 100
+    if event["type"] == "payment_intent.succeeded":
+        payment_intent = event["data"]["object"]
+        payment_id = payment_intent["id"]
         try:
             payment = Payment.objects.get(stripe_payment_intent_id=payment_id)
-            payment.status = 'succeeded'
+            payment.status = "succeeded"
             payment.save()
         except Payment.DoesNotExist:
             return HttpResponse(status=404)
 
-    elif event['type'] == 'payment_intent.payment_failed':
-        payment_intent = event['data']['object']
-        payment_id = payment_intent['id']
+    elif event["type"] == "payment_intent.payment_failed":
+        payment_intent = event["data"]["object"]
+        payment_id = payment_intent["id"]
         try:
             payment = Payment.objects.get(stripe_payment_intent_id=payment_id)
-            payment.status = 'failed'
+            payment.status = "failed"
             payment.save()
         except Payment.DoesNotExist:
             return HttpResponse(status=404)

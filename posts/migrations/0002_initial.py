@@ -10,39 +10,51 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('posts', '0001_initial'),
+        ("posts", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='post',
-            name='author',
+            model_name="post",
+            name="author",
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
-            model_name='post',
-            name='category',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='posts', to='posts.category'),
+            model_name="post",
+            name="category",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, related_name="posts", to="posts.category"
+            ),
         ),
         migrations.AddField(
-            model_name='post',
-            name='owner',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='owned_posts', to=settings.AUTH_USER_MODEL),
+            model_name="post",
+            name="owner",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, related_name="owned_posts", to=settings.AUTH_USER_MODEL
+            ),
         ),
         migrations.AddField(
-            model_name='subcategory',
-            name='category',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='subcategories', to='posts.category'),
+            model_name="subcategory",
+            name="category",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, related_name="subcategories", to="posts.category"
+            ),
         ),
         migrations.AddField(
-            model_name='post',
-            name='subcategory',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='post_subcategories', to='posts.subcategory'),
+            model_name="post",
+            name="subcategory",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="post_subcategories",
+                to="posts.subcategory",
+            ),
         ),
         migrations.AddField(
-            model_name='subscription',
-            name='user',
+            model_name="subscription",
+            name="user",
             field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
         ),
     ]

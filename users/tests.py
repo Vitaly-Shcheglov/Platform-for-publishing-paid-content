@@ -1,12 +1,14 @@
+import json
+
+from django.contrib.auth import get_user_model
+from django.test import Client, TestCase
+from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
-from .models import Payment
-from posts.models import Post
-from django.test import TestCase
-from django.urls import reverse
-from django.contrib.auth import get_user_model
-from .models import CustomUser
 
+from posts.models import Post
+
+from .models import CustomUser, Payment
 
 User = get_user_model()
 
@@ -27,6 +29,7 @@ class PaymentViewsTest(TestCase):
         payment (Payment): Тестовый платеж, созданный для проверки логики
             обработки платежей.
     """
+
     def setUp(self):
         """
         Подготовка данных для тестов.
@@ -37,28 +40,25 @@ class PaymentViewsTest(TestCase):
         """
         self.client = APIClient()
         self.user = CustomUser.objects.create_user(
-            username='testuser',
-            email='test@example.com',
-            password='password123',
-            phone_number='1234567890',
-            country='Russia'
+            username="testuser",
+            email="test@example.com",
+            password="password123",
+            phone_number="1234567890",
+            country="Russia",
         )
-        self.client.login(username='testuser', password='password123')
+        self.client.login(username="testuser", password="password123")
 
         self.post = Post.objects.create(
-            title='Test Post',
-            content='This is a test post.',
-            is_published=True,
-            owner=self.user
+            title="Test Post", content="This is a test post.", is_published=True, owner=self.user
         )
 
         self.payment = Payment.objects.create(
             user=self.user,
             paid_post=self.post,
             amount=100.00,
-            payment_method='cash',
+            payment_method="cash",
             is_subscription=False,
-            stripe_payment_intent_id='test_intent_id'
+            stripe_payment_intent_id="test_intent_id",
         )
 
     def test_payment_list_view(self):
@@ -73,7 +73,7 @@ class PaymentViewsTest(TestCase):
             - Статус ответа.
             - Количество платежей в ответе.
         """
-        response = self.client.get(reverse('payment_list'))
+        response = self.client.get(reverse("payment_list"))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
 
@@ -89,12 +89,15 @@ class PaymentViewsTest(TestCase):
             - Статус ответа.
             - Существование нового платежа в базе данных.
         """
-        response = self.client.post(reverse('payment_create'), data={
-            'amount': 100.00,
-            'paid_post': self.post.id,
-            'payment_method': 'cash',
-            'is_subscription': False,
-        })
+        response = self.client.post(
+            reverse("payment_create"),
+            data={
+                "amount": 100.00,
+                "paid_post": self.post.id,
+                "payment_method": "cash",
+                "is_subscription": False,
+            },
+        )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(Payment.objects.filter(user=self.user, amount=100.00).exists())
 
@@ -119,15 +122,16 @@ class PaymentViewsTest(TestCase):
                     "id": "test_intent_id",
                     "amount_received": 10000,
                 }
-            }
+            },
         }
 
-        response = self.client.post(reverse('stripe_webhook'), data=json.dumps(payload),
-                                    content_type='application/json')
+        response = self.client.post(
+            reverse("stripe_webhook"), data=json.dumps(payload), content_type="application/json"
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         payment = Payment.objects.get(stripe_payment_intent_id="test_intent_id")
-        self.assertEqual(payment.status, 'succeeded')
+        self.assertEqual(payment.status, "succeeded")
 
 
 class UserViewsTest(TestCase):
@@ -143,6 +147,7 @@ class UserViewsTest(TestCase):
         client (Client): Клиент для выполнения запросов к API.
         user (User): Тестовый пользователь, созданный для выполнения запросов.
     """
+
     def setUp(self):
         """
         Подготовка данных для тестов.
@@ -153,11 +158,11 @@ class UserViewsTest(TestCase):
         """
         self.client = Client()
         self.user = User.objects.create_user(
-            username='testuser',
-            email='test@example.com',
-            password='password123',
-            phone_number='1234567890',
-            country='Russia'
+            username="testuser",
+            email="test@example.com",
+            password="password123",
+            phone_number="1234567890",
+            country="Russia",
         )
 
     def test_user_registration_view(self):
@@ -172,15 +177,18 @@ class UserViewsTest(TestCase):
             - Статус ответа должен быть 302 (перенаправление).
             - Новый пользователь должен существовать в базе данных.
         """
-        response = self.client.post(reverse('register'), data={
-            'username': 'newuser',
-            'email': 'newuser@example.com',
-            'phone_number': '0987654321',
-            'country': 'USA',
-            'password': 'password123'
-        })
+        response = self.client.post(
+            reverse("register"),
+            data={
+                "username": "newuser",
+                "email": "newuser@example.com",
+                "phone_number": "0987654321",
+                "country": "USA",
+                "password": "password123",
+            },
+        )
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(User.objects.filter(username='newuser').exists())
+        self.assertTrue(User.objects.filter(username="newuser").exists())
 
     def test_login_view(self):
         """
@@ -193,10 +201,7 @@ class UserViewsTest(TestCase):
             - Статус ответа должен быть 302 (перенаправление).
             - В текущем запросе должен быть авторизован пользователь.
         """
-        response = self.client.post(reverse('login'), data={
-            'username': 'testuser',
-            'password': 'password123'
-        })
+        response = self.client.post(reverse("login"), data={"username": "testuser", "password": "password123"})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.wsgi_request.user, self.user)
 
@@ -212,15 +217,18 @@ class UserViewsTest(TestCase):
             - Статус ответа должен быть 302 (перенаправление).
             - Номер телефона пользователя должен быть обновлен.
         """
-        self.client.login(username='testuser', password='password123')
-        response = self.client.post(reverse('profile_edit'), data={
-            'phone_number': '9876543210',
-            'country': 'Canada',
-            'avatar': '',
-        })
+        self.client.login(username="testuser", password="password123")
+        response = self.client.post(
+            reverse("profile_edit"),
+            data={
+                "phone_number": "9876543210",
+                "country": "Canada",
+                "avatar": "",
+            },
+        )
         self.assertEqual(response.status_code, 302)
         self.user.refresh_from_db()
-        self.assertEqual(self.user.phone_number, '9876543210')
+        self.assertEqual(self.user.phone_number, "9876543210")
 
     def test_user_list_view(self):
         """
@@ -233,7 +241,7 @@ class UserViewsTest(TestCase):
             - Статус ответа должен быть 200.
             - Имя пользователя должно содержаться в ответе.
         """
-        response = self.client.get(reverse('user_list'))
+        response = self.client.get(reverse("user_list"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.user.username)
 
@@ -249,13 +257,11 @@ class UserViewsTest(TestCase):
             - Статус ответа должен быть 302 (перенаправление).
             - Пользователь должен быть заблокирован.
         """
-        self.client.login(username='testuser', password='password123')
+        self.client.login(username="testuser", password="password123")
         user_to_block = User.objects.create_user(
-            username='blockuser',
-            email='blockuser@example.com',
-            password='password123'
+            username="blockuser", email="blockuser@example.com", password="password123"
         )
-        response = self.client.post(reverse('block_user', kwargs={'user_id': user_to_block.id}))
+        response = self.client.post(reverse("block_user", kwargs={"user_id": user_to_block.id}))
         self.assertEqual(response.status_code, 302)
         user_to_block.refresh_from_db()
         self.assertTrue(user_to_block.is_blocked)

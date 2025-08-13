@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from .models import CustomUser
 
 
@@ -13,4 +14,5 @@ class AutorAdmin(admin.ModelAdmin):
     Атрибуты:
         exclude (tuple): Поля, которые будут исключены из формы редактирования в админ-панели.
     """
+
     exclude = ("password",)

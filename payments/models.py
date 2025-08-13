@@ -19,20 +19,21 @@ class Payment(models.Model):
         stripe_payment_intent_id (CharField): Уникальный идентификатор платежа в Stripe.
         status (CharField): Статус платежа (например, 'pending', 'succeeded', 'failed').
     """
+
     PAYMENT_METHODS = [
-        ('cash', 'Наличные'),
-        ('transfer', 'Перевод на счет'),
-        ('stripe', 'Stripe'),
+        ("cash", "Наличные"),
+        ("transfer", "Перевод на счет"),
+        ("stripe", "Stripe"),
     ]
 
-    user = models.ForeignKey('users.CustomUser', on_delete=models.CASCADE)
+    user = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE)
     payment_date = models.DateTimeField(auto_now_add=True)
-    paid_post = models.ForeignKey('posts.Post', null=True, blank=True, on_delete=models.CASCADE)
+    paid_post = models.ForeignKey("posts.Post", null=True, blank=True, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_method = models.CharField(max_length=10, choices=PAYMENT_METHODS)
     is_subscription = models.BooleanField(default=False)
     stripe_payment_intent_id = models.CharField(max_length=255, unique=True)
-    status = models.CharField(max_length=50, default='pending')
+    status = models.CharField(max_length=50, default="pending")
 
     def __str__(self):
         """
@@ -43,4 +44,6 @@ class Payment(models.Model):
         Returns:
             str: Информация о платеже, форматированная как "username - amount - payment_method".
         """
-        return f"{self.user.username} - {self.amount} - {'Subscription' if self.is_subscription else self.payment_method}"
+        return (
+            f"{self.user.username} - {self.amount} - {'Subscription' if self.is_subscription else self.payment_method}"
+        )

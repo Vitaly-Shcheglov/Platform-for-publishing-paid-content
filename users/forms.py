@@ -1,4 +1,5 @@
 from django import forms
+
 from .models import CustomUser
 
 
@@ -12,6 +13,7 @@ class UserRegistrationForm(forms.ModelForm):
     Атрибуты:
         password (CharField): Поле для ввода пароля, скрытое от глаз пользователя.
     """
+
     password = forms.CharField(widget=forms.PasswordInput)
 
     class Meta:
@@ -49,6 +51,7 @@ class UserProfileForm(forms.ModelForm):
     Атрибуты:
         None
     """
+
     class Meta:
         model = CustomUser
         fields = ["avatar", "phone_number", "country"]

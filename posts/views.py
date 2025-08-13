@@ -1,27 +1,25 @@
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse_lazy
-from .models import Post, Category, Subcategory
-from django.http import HttpResponse, HttpResponseForbidden
-from django.views import View
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
-from django.views.decorators.cache import cache_page
 from django.contrib.auth.decorators import login_required
-from .services import PostService
-from users.models import CustomUser
-from django.views.generic import ListView
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.db import connection
-from django.http import JsonResponse
-from django.shortcuts import render, get_object_or_404
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
+from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
+from django.views import View
+from django.views.decorators.cache import cache_page
 from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 from drf_yasg.utils import swagger_auto_schema
-from .models import Subscription
-from .serializers import SubscriptionSerializer
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from users.models import CustomUser
+
 from .forms import PostForm, SubscriptionForm
+from .models import Category, Post, Subcategory, Subscription
+from .serializers import SubscriptionSerializer
+from .services import PostService
 
 
 class HomeView(ListView):
@@ -37,6 +35,7 @@ class HomeView(ListView):
         context_object_name (str): Имя контекста, под которым будут доступны посты в шаблоне.
         paginate_by (int): Количество постов на странице.
     """
+
     model = Post
     template_name = "posts/home.html"
     context_object_name = "posts"
@@ -73,7 +72,7 @@ class HomeView(ListView):
                 category_dict[category] = []
             category_dict[category].append(subcategory)
 
-        context['categories'] = category_dict
+        context["categories"] = category_dict
 
         return context
 
@@ -85,6 +84,7 @@ class ContactView(View):
     Этот класс обрабатывает GET и POST запросы на страницу контактов.
     Позволяет пользователю отправлять сообщения через форму обратной связи.
     """
+
     def get(self, request):
         """
         Обрабатывает GET-запрос.
@@ -126,7 +126,7 @@ class PostDetailView(LoginRequiredMixin, DetailView):
     """
     View для отображения деталей поста.
 
-    Этот класс отображает информацию о конкретном посте и требует, 
+    Этот класс отображает информацию о конкретном посте и требует,
     чтобы пользователь был авторизован.
 
     Атрибуты:
@@ -135,6 +135,7 @@ class PostDetailView(LoginRequiredMixin, DetailView):
         template_name (str): Шаблон, используемый для рендеринга страницы.
         context_object_name (str): Имя контекста, под которым будет доступен пост в шаблоне.
     """
+
     model = Post
     form_class = PostForm
     template_name = "posts/post_detail.html"
@@ -154,6 +155,7 @@ class AddPostView(CreateView):
         template_name (str): Шаблон, используемый для рендеринга страницы добавления поста.
         success_url (str): URL, на который будет перенаправлен пользователь после успешного создания поста.
     """
+
     model = Post
     form_class = PostForm
     template_name = "posts/add_post.html"
@@ -171,11 +173,11 @@ class AddPostView(CreateView):
         """
         if self.request.user.is_authenticated:
             form.instance.author = self.request.user
-            form.instance.is_paid = form.cleaned_data.get('is_paid', False)
+            form.instance.is_paid = form.cleaned_data.get("is_paid", False)
         else:
             form.instance.is_paid = False
 
-        form.instance.subcategory = form.cleaned_data.get('subcategory')
+        form.instance.subcategory = form.cleaned_data.get("subcategory")
 
         return super().form_valid(form)
 
@@ -193,6 +195,7 @@ class PostListView(ListView):
         template_name (str): Шаблон, используемый для отображения списка постов.
         context_object_name (str): Имя контекста, под которым будут доступны посты в шаблоне.
     """
+
     model = Post
     form_class = PostForm
     template_name = "posts/post_list.html"
@@ -220,6 +223,7 @@ class PostUpdateView(LoginRequiredMixin, UpdateView):
         template_name (str): Шаблон, используемый для отображения формы редактирования поста.
         success_url (str): URL, на который будет перенаправлен пользователь после успешного обновления поста.
     """
+
     model = Post
     form_class = PostForm
     template_name = "posts/post_form.html"
@@ -234,10 +238,7 @@ class PostUpdateView(LoginRequiredMixin, UpdateView):
                          или состоит в группе модераторов постов; иначе False.
         """
         post = self.get_object()
-        return (
-            self.request.user == post.owner
-            or self.request.user.groups.filter(name="Post moderator group").exists()
-        )
+        return self.request.user == post.owner or self.request.user.groups.filter(name="Post moderator group").exists()
 
 
 class PostDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
@@ -252,6 +253,7 @@ class PostDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
         success_url (str): URL, на который будет перенаправлен пользователь после успешного удаления поста.
         permission_required (str): Права, необходимые для удаления постов.
     """
+
     model = Post
     template_name = "posts/post_confirm_delete.html"
     success_url = reverse_lazy("post_list")
@@ -281,8 +283,7 @@ class PostDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
         """
         product = self.get_object()
         return (
-            self.request.user == product.owner
-            or self.request.user.groups.filter(name="Post moderator group").exists()
+            self.request.user == product.owner or self.request.user.groups.filter(name="Post moderator group").exists()
         )
 
 
@@ -292,6 +293,7 @@ class PublishPostView(View):
 
     Этот класс позволяет пользователю опубликовать свой пост, если он является его владельцем.
     """
+
     def post(self, request, pk):
         """
         Обрабатывает публикацию поста.
@@ -316,6 +318,7 @@ class UnpublishPostView(LoginRequiredMixin, UserPassesTestMixin, View):
     Этот класс позволяет пользователям отменить публикацию своих постов,
     если они являются владельцами этих постов или модераторами.
     """
+
     permission_required = "catalog.can_unpublish_post"
 
     def post(self, request, pk):
@@ -332,8 +335,8 @@ class UnpublishPostView(LoginRequiredMixin, UserPassesTestMixin, View):
         post = get_object_or_404(Post, pk=pk)
 
         if request.user == post.owner or request.user.groups.filter(name="Post moderator group").exists():
-            product.is_published = False
-            product.save()
+            post.is_published = False
+            post.save()
             return redirect("post_list")
         else:
             return HttpResponseForbidden("У вас нет прав для отмены публикации этой записи.")
@@ -348,8 +351,7 @@ class UnpublishPostView(LoginRequiredMixin, UserPassesTestMixin, View):
         """
         post = get_object_or_404(Post, pk=self.kwargs["pk"])
         return (
-            self.request.user == post.owner
-            or self.request.user.groups.filter(name="Product moderator group").exists()
+            self.request.user == post.owner or self.request.user.groups.filter(name="Product moderator group").exists()
         )
 
 
@@ -365,6 +367,7 @@ class PostsInCategoryView(ListView):
         template_name (str): Шаблон, используемый для отображения постов.
         context_object_name (str): Имя контекста, под которым будут доступны посты в шаблоне.
     """
+
     model = Post
     template_name = "posts/poss_in_category.html"
     context_object_name = "posts"
@@ -419,10 +422,11 @@ def create_post(request):
             post = form.save(commit=False)
             post.author = request.user
             post.save()
-            return redirect('home')
+            return redirect("home")
     else:
         form = PostForm()
-    return render(request, 'posts/create_post.html', {'form': form})
+    return render(request, "posts/create_post.html", {"form": form})
+
 
 class PostsFreeListView(ListView):
     """
@@ -436,6 +440,7 @@ class PostsFreeListView(ListView):
         template_name (str): Шаблон, используемый для отображения бесплатных постов.
         context_object_name (str): Имя контекста, под которым будут доступны бесплатные посты в шаблоне.
     """
+
     model = Post
     template_name = "posts/posts_free.html"
     context_object_name = "posts_free"
@@ -454,7 +459,7 @@ class PostsPaidListView(LoginRequiredMixin, ListView):
     """
     View для отображения платных постов.
 
-    Этот класс предоставляет API для получения списка всех платных постов 
+    Этот класс предоставляет API для получения списка всех платных постов
     (постов, которые требуют оплаты для доступа).
 
     Атрибуты:
@@ -462,6 +467,7 @@ class PostsPaidListView(LoginRequiredMixin, ListView):
         template_name (str): Шаблон, используемый для отображения платных постов.
         context_object_name (str): Имя контекста, под которым будут доступны платные посты в шаблоне.
     """
+
     model = Post
     template_name = "posts/posts_paid.html"
     context_object_name = "posts"
@@ -488,9 +494,10 @@ class CategoryListView(LoginRequiredMixin, ListView):
         template_name (str): Шаблон, используемый для отображения списка категорий.
         context_object_name (str): Имя контекста, под которым будут доступны категории в шаблоне.
     """
+
     model = Category
-    template_name = 'categories/category_list.html'
-    context_object_name = 'categories'
+    template_name = "categories/category_list.html"
+    context_object_name = "categories"
 
     def get_queryset(self):
         """
@@ -515,8 +522,8 @@ class CategoryListView(LoginRequiredMixin, ListView):
         user = self.request.user
 
         if isinstance(user, CustomUser):
-            context['user'] = user
-            context['has_paid_subscription'] = user.has_paid_subscription
+            context["user"] = user
+            context["has_paid_subscription"] = user.has_paid_subscription
 
         return context
 
@@ -531,6 +538,7 @@ class GetSubcategoriesView(View):
     Атрибуты:
         None
     """
+
     def get(self, request, *args, **kwargs):
         """
         Обрабатывает GET-запрос для получения подкатегорий.
@@ -541,8 +549,8 @@ class GetSubcategoriesView(View):
         Returns:
             JsonResponse: Ответ с информацией о подкатегориях в формате JSON.
         """
-        category_id = request.GET.get('category')
-        subcategories = Subcategory.objects.filter(category_id=category_id).values('id', 'name')
+        category_id = request.GET.get("category")
+        subcategories = Subcategory.objects.filter(category_id=category_id).values("id", "name")
         return JsonResponse(list(subcategories), safe=False)
 
 
@@ -556,8 +564,7 @@ class SubscriptionView(APIView):
 
     @method_decorator(csrf_exempt)
     @swagger_auto_schema(
-        request_body=SubscriptionSerializer,
-        responses={201: 'Подписка создана', 400: 'Ошибка валидации'}
+        request_body=SubscriptionSerializer, responses={201: "Подписка создана", 400: "Ошибка валидации"}
     )
     def post(self, request):
         """
@@ -570,17 +577,17 @@ class SubscriptionView(APIView):
             Response: Ответ с информацией о созданной подписке или ошибках валидации.
         """
         data = request.data.copy()
-        data['user'] = request.user.id
+        data["user"] = request.user.id
         serializer = SubscriptionSerializer(data=data)
 
         if serializer.is_valid():
             subscription = serializer.save()
-            return Response({'status': 'subscribed', 'subscription_id': subscription.id}, status=status.HTTP_201_CREATED)
+            return Response(
+                {"status": "subscribed", "subscription_id": subscription.id}, status=status.HTTP_201_CREATED
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @swagger_auto_schema(
-        responses={200: SubscriptionSerializer(many=False)}
-    )
+    @swagger_auto_schema(responses={200: SubscriptionSerializer(many=False)})
     def get(self, request):
         """
         Возвращает информацию о текущей подписке пользователя.
@@ -605,7 +612,7 @@ class SubscriptionView(APIView):
         Returns:
             HttpResponse: Ответ с рендером шаблона для управления подписками.
         """
-        return render(request, 'subscription.html')
+        return render(request, "subscription.html")
 
 
 @login_required
@@ -631,15 +638,15 @@ def subscription_view(request):
             subscription, created = Subscription.objects.get_or_create(
                 user=request.user,
                 defaults={
-                    'plan': subscription_data['plan'],
-                    'end_date': subscription_data['end_date'],
-                    'is_active': True
-                }
+                    "plan": subscription_data["plan"],
+                    "end_date": subscription_data["end_date"],
+                    "is_active": True,
+                },
             )
 
             if not created:
-                subscription.plan = subscription_data['plan']
-                subscription.end_date = subscription_data['end_date']
+                subscription.plan = subscription_data["plan"]
+                subscription.end_date = subscription_data["end_date"]
                 subscription.is_active = True
                 subscription.save()
 
@@ -648,6 +655,7 @@ def subscription_view(request):
         form = SubscriptionForm()
 
     return render(request, "posts/subscription.html", {"form": form})
+
 
 def subscription_success_view(request):
     """
@@ -663,4 +671,3 @@ def subscription_success_view(request):
         HttpResponse: Ответ с рендером шаблона успеха подписки.
     """
     return render(request, "subscription_success.html")
-

@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from .models import Payment
 
 
@@ -21,6 +22,7 @@ class PaymentSerializer(serializers.ModelSerializer):
         payment_method (str): Метод оплаты, использованный для транзакции (например, 'stripe').
         is_subscription (bool): Указывает, является ли данный платеж подпиской.
     """
+
     class Meta:
         model = Payment
-        fields = ['id', 'user', 'payment_date', 'paid_post', 'amount', 'payment_method', 'is_subscription']
+        fields = ["id", "user", "payment_date", "paid_post", "amount", "payment_method", "is_subscription"]

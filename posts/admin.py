@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Post, Category
+
+from .models import Category, Post
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -11,6 +12,7 @@ class CategoryAdmin(admin.ModelAdmin):
     Атрибуты:
         list_display (tuple): Список полей, которые будут отображаться в таблице категорий.
     """
+
     list_display = ("id", "name")
 
 
@@ -26,6 +28,7 @@ class PostAdmin(admin.ModelAdmin):
         list_filter (tuple): Список полей, по которым можно фильтровать посты.
         search_fields (tuple): Список полей, по которым можно выполнять поиск.
     """
+
     list_display = ("id", "title", "category")
 
     list_filter = ("category",)
