@@ -650,7 +650,7 @@ def subscription_view(request):
     return render(request, "posts/subscription.html", {"form": form})
 
 def subscription_success_view(request):
-     """
+    """
     Страница успеха после подписки.
 
     Этот view отображает страницу успеха, на которую пользователь
@@ -663,3 +663,4 @@ def subscription_success_view(request):
         HttpResponse: Ответ с рендером шаблона успеха подписки.
     """
     return render(request, "subscription_success.html")
+
