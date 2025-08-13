@@ -4,9 +4,32 @@ from users.models import CustomUser
 
 
 class Command(BaseCommand):
+    """
+    Команда для создания групп с определенными разрешениями.
+
+    Этот класс создает группу "Post moderator group" и назначает ей
+    определенные разрешения. Также он добавляет пользователя в созданную группу.
+
+    Атрибуты:
+        help (str): Описание команды, которое будет отображаться в справке.
+    """
     help = "Create groups with specific permissions"
 
     def handle(self, *args, **kwargs):
+        """
+        Выполняет команду для создания группы и назначения разрешений.
+
+        Этот метод создает группу "Post moderator group", если она не
+        существует, и добавляет к ней определенные разрешения. Затем
+        он добавляет указанного пользователя в эту группу.
+
+        Args:
+            *args: Позиционные аргументы, переданные в команду.
+            **kwargs: Именованные аргументы, переданные в команду.
+
+        Returns:
+        None: Метод не возвращает значения, но выводит сообщение об успехе.
+        """
         post_moderator_group, created = Group.objects.get_or_create(name="Post moderator group")
         can_unpublish_permission = Permission.objects.get(codename="can_unpublish_post")
         can_delete_permission = Permission.objects.get(codename="can_delete_post")

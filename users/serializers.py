@@ -2,6 +2,16 @@ from rest_framework import serializers
 from .models import CustomUser
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для регистрации нового пользователя.
+
+    Этот сериализатор позволяет пользователю вводить данные для создания нового аккаунта,
+    включая номер телефона, адрес электронной почты и пароль. Он также выполняет валидацию
+    данных и создает нового пользователя.
+
+    Атрибуты:
+        password (CharField): Поле для ввода пароля, скрытое от глаз пользователя.
+    """
     password = serializers.CharField(write_only=True)
 
     class Meta:
@@ -9,6 +19,19 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         fields = ["phone_number", "email", "password", "avatar", "country"]
 
     def create(self, validated_data):
+        """
+        Создает нового пользователя на основе валидированных данных.
+
+        Этот метод переопределяет стандартный метод создания для сериализатора и
+        устанавливает зашифрованный пароль для нового пользователя.
+
+        Args:
+            validated_data (dict): Валидированные данные, полученные из формы.
+                Содержит поля, необходимые для создания пользователя.
+
+        Returns:
+            CustomUser: Созданный объект пользователя.
+        """
         user = CustomUser(
             phone_number=validated_data['phone_number'],
             email=validated_data['email'],
@@ -20,6 +43,21 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return user
 
     def validate(self, data):
+        """
+        Проверяет валидность данных перед созданием пользователя.
+
+        Этот метод проверяет, существует ли уже пользователь с данным номером телефона
+        или адресом электронной почты, и вызывает ошибку валидации, если это так.
+
+        Args:
+            data (dict): Данные, полученные из формы.
+
+        Returns:
+            dict: Валидированные данные.
+
+        Raises:
+            serializers.ValidationError: Если номер телефона или адрес электронной почты уже зарегистрированы.
+        """
         if CustomUser.objects.filter(phone_number=data['phone_number']).exists():
             raise serializers.ValidationError({"phone_number": "Этот номер телефона уже зарегистрирован."})
         if CustomUser.objects.filter(email=data['email']).exists():
