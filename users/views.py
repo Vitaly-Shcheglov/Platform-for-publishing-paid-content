@@ -12,6 +12,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
+from django.shortcuts import render, redirect
 
 from .forms import UserProfileForm, UserRegistrationForm
 from .models import CustomUser
@@ -416,6 +417,7 @@ def login_view(request):
         if user is not None:
             login(request, user)
             messages.success(request, "Успешный вход в систему!")
+
             return redirect("home")
         else:
             messages.error(request, "Неверные учетные данные.")

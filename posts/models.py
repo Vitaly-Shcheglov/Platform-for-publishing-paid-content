@@ -21,9 +21,7 @@ class Category(models.Model):
 
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    parent = models.ForeignKey(
-        "self", on_delete=models.CASCADE, blank=True, null=True, related_name="child_categories"
-    )
+
 
     class Meta:
         verbose_name = "Категория"
@@ -96,10 +94,10 @@ class Post(models.Model):
     subcategory = models.ForeignKey(
         Subcategory, on_delete=models.CASCADE, related_name="post_subcategories", null=True, blank=True
     )
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="owned_posts")
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="owned_posts", null=True)
     is_published = models.BooleanField(default=False)
     is_paid = models.BooleanField(default=False)
     image = models.ImageField(upload_to="uploads/", null=True, blank=True)

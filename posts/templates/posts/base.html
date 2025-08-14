@@ -6,17 +6,26 @@
     <title>{% block title %}Контент Платформа{% endblock %}</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
 </head>
 <body>
 
     <header>
         {% include "posts/menu.html" %}
     </header>
+    {% if messages %}
+
+{% for message in messages %}
+{{ message }}
+{% endfor %}
+
+{% endif %}
      <main>
         {% block content %}{% endblock %}
     </main>
     <footer>
         <p>© 2025 Контент Платформа</p>
     </footer>
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 </body>
 </html>

@@ -1,8 +1,9 @@
 from django.contrib import admin
 
-from .models import Category, Post
+from .models import Category, Subcategory, Post
 
 
+@admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     """
     Административная панель для управления категориями.
@@ -16,6 +17,34 @@ class CategoryAdmin(admin.ModelAdmin):
     list_display = ("id", "name")
 
 
+@admin.register(Subcategory)
+class SubcategoryAdmin(admin.ModelAdmin):
+    """
+    Административный интерфейс для модели Subcategory.
+
+    Этот класс управляет отображением и функциональностью модели Subcategory
+    в административной панели Django. Он наследуется от admin.ModelAdmin
+    и позволяет настраивать, как модель будет представлена и управляться.
+
+    Атрибуты:
+        list_display (tuple): Кортеж, определяющий, какие поля модели
+            будут отображаться в списке объектов в административной панели.
+            В данном случае отображаются 'id' и 'name'.
+        search_fields (tuple): Список полей, по которым можно выполнять поиск.
+
+    Методы:
+        - list_display: Определяет, какие поля будут отображены в таблице списка
+            объектов. В этом случае отображаются идентификатор и название подкатегории.
+        - search_fields: Определяет, по каким полям можно выполнять поиск в
+            административной панели. В данном случае поиск осуществляется по
+            названию подкатегории, что упрощает поиск нужных элементов.
+    """
+
+    list_display = ('id', 'name', 'category')
+    search_fields = ('name',)
+
+
+@admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
     """
     Административная панель для управления постами.
@@ -29,11 +58,7 @@ class PostAdmin(admin.ModelAdmin):
         search_fields (tuple): Список полей, по которым можно выполнять поиск.
     """
 
-    list_display = ("id", "title", "category")
+    list_display = ("id", "title", "category", "is_published", "created_at")
 
-    list_filter = ("category",)
-    search_fields = ("name", "description")
-
-
-admin.site.register(Category, CategoryAdmin)
-admin.site.register(Post, PostAdmin)
+    list_filter = ("category", "is_published")
+    search_fields = ("title", "content")

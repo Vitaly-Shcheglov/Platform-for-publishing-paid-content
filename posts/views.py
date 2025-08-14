@@ -671,3 +671,56 @@ def subscription_success_view(request):
         HttpResponse: Ответ с рендером шаблона успеха подписки.
     """
     return render(request, "subscription_success.html")
+
+
+def category_detail_view(request, category_id):
+    """
+    Представление для отображения деталей категории.
+
+    Это представление обрабатывает GET-запросы для получения информации о категории
+    и ее подкатегориях. Если идентификатор категории не существует, будет возвращена
+    страница 404.
+
+    Args:
+        request (HttpRequest): Объект запроса, содержащий информацию о текущем запросе.
+        category_id (int): Идентификатор категории, для которой нужно отобразить детали.
+
+    Returns:
+        HttpResponse:
+            Если категория найдена, возвращает страницу с деталями категории и подкатегорий.
+            Если категория не найдена, возвращает страницу 404 (Not Found).
+
+    Примечания:
+        - В случае успешного получения категории, также будет доступна информация о родительской категории.
+        - В шаблоне отображаются название категории, ее описание и список подкатегорий.
+    """
+    category = get_object_or_404(Category, id=category_id)
+
+    parent_category = category.parent
+
+    context = {
+        'category': category,
+        'parent_category': parent_category,
+    }
+
+    return render(request, 'category_detail.html', context)
+
+
+def subcategory_detail_view(request, subcategory_id):
+    """
+    Представление для отображения деталей подкатегории.
+
+    Args:
+        request (HttpRequest): Объект запроса.
+        subcategory_id (int): Идентификатор подкатегории.
+
+    Returns:
+        HttpResponse: Страница с деталями подкатегории.
+    """
+    subcategory = get_object_or_404(Subcategory, id=subcategory_id)
+
+    context = {
+        'subcategory': subcategory,
+    }
+
+    return render(request, 'subcategory_detail.html', context)

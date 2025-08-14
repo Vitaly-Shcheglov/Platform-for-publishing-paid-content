@@ -18,6 +18,8 @@ from .views import (
     UnpublishPostView,
     subscription_success_view,
     subscription_view,
+    category_detail_view,
+    subcategory_detail_view,
 )
 
 urlpatterns = [
@@ -38,4 +40,6 @@ urlpatterns = [
     path("subscription/", subscription_view, name="subscription"),
     path("api/subscription/", SubscriptionView.as_view(), name="api_subscription"),
     path("subscription/success/", subscription_success_view, name="subscription_success"),
+    path('category/<int:category_id>/', category_detail_view, name='category_detail'),
+    path('subcategory/<int:subcategory_id>/', subcategory_detail_view, name='subcategory_detail'),
 ]

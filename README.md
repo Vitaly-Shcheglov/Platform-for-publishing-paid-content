@@ -265,7 +265,7 @@ DATABASE_URL=postgres://user:password@db:5432/dbname
 Запуск кастомных команд:
 - python manage.py create_groups - для создания определённых групп пользователей
 - python manage.py create_superuser - для создания суперпользователя
-- python manage.py load_categories - для загрузки и категорий в базу данных
+- python manage.py load_categories - для загрузки категорий и субкатегорий в базу данных
 - python manage.py loaddata subscriptions.json - для загрузки начальных данных в базу данных  с данными о подписках пользователя с идентификатором 1
 - python manage.py loaddata users.json - для создания двух пользователей в модели users.customuser с заданными полями и первичными ключами
 

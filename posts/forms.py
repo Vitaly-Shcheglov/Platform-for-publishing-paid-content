@@ -163,7 +163,7 @@ class PostForm(forms.ModelForm):
         if "category" in self.data:
             try:
                 category_id = int(self.data.get("category"))
-                self.fields["subcategory"].queryset = Subcategory.objects.filter(parent_id=category_id).order_by(
+                self.fields["subcategory"].queryset = Subcategory.objects.filter(category_id=category_id).order_by(
                     "name"
                 )
             except (ValueError, TypeError):
