@@ -1,18 +1,18 @@
 {% extends 'posts/base.html' %}
 {% load static %}
 
-{% load post_filters %}
+{% load posts_filters %}
 
-{% block title %}{{ post.name }}{% endblock %}
+{% block title %}{{ post.title }}{% endblock %}
 
 {% block content %}
     <div class="container">
-        <h1>{{ post.name }}</h1>
-        {% if postt.image %}
-            <img src="{{ post.image.url }}" alt="{{ post.name }}">
+        <h1>{{ post.title }}</h1>
+        {% if post.image %}
+            <img src="{{ post.image.url }}" alt="{{ post.title }}">
         {% endif %}
-        <p>{{ post.description }}</p>
-
+        <p>{{ post.content }}</p>
+        {{post.is_published}}
         {% if post.is_published %}
             <p class="text-success">Статус: Запись опубликована.</p>
         {% else %}
@@ -31,7 +31,7 @@
         {% endif %}
 
         {% if request.user == post.owner %}
-            <form action="{% url 'publish_post' product.pk %}" method="POST" style="display:inline;">
+            <form action="{% url 'publish_post' post.pk %}" method="POST" style="display:inline;">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-success">Опубликовать</button>
             </form>

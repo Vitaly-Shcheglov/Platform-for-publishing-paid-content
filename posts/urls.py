@@ -20,6 +20,7 @@ from .views import (
     subscription_view,
     category_detail_view,
     subcategory_detail_view,
+    update_post_status,
 )
 
 urlpatterns = [
@@ -42,4 +43,5 @@ urlpatterns = [
     path("subscription/success/", subscription_success_view, name="subscription_success"),
     path('category/<int:category_id>/', category_detail_view, name='category_detail'),
     path('subcategory/<int:subcategory_id>/', subcategory_detail_view, name='subcategory_detail'),
+    path('post/<int:post_id>/update/', update_post_status, name='update_post_status'),
 ]

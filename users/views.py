@@ -56,6 +56,8 @@ class UserRegisterView(APIView):
         if serializer.is_valid():
             user = serializer.save()
 
+            refresh = RefreshToken.for_user(user)
+
             try:
                 send_mail(
                     "Добро пожаловать!",
@@ -71,7 +73,9 @@ class UserRegisterView(APIView):
             except Exception as e:
                 print(f"Ошибка при отправке письма: {e}")
 
-            return Response({"message": "Пользователь успешно зарегистрирован."}, status=status.HTTP_201_CREATED)
+            return Response({"message": "Пользователь успешно зарегистрирован.",
+                "refresh": str(refresh),
+                "access": str(refresh.access_token),}, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -477,3 +481,31 @@ class CustomTokenObtainPairView(TokenObtainPairView):
     """
 
     permission_classes = []
+
+    def post(self, request, *args, **kwargs):
+        """
+        Обрабатывает POST-запрос для получения токена JWT.
+
+        Этот метод переопределяет родительский метод `post` класса `TokenObtainPairView`
+        для обработки аутентификации пользователей и генерации токенов JWT.
+
+        Args:
+            request (Request): Объект запроса, содержащий данные для аутентификации.
+            *args: Дополнительные позиционные аргументы (не используются).
+            **kwargs: Дополнительные именованные аргументы (не используются).
+
+        Returns:
+            Response:
+                Если аутентификация прошла успешно, возвращает объект Response с
+                токенами доступа в формате JSON, включая токен обновления и токен доступа.
+                Если аутентификация не удалась, возвращает сообщение об ошибке
+                с соответствующим статусом HTTP (например, 401 Unauthorized).
+
+        Примечания:
+            - Этот метод используется для обработки запросов от клиента
+              для получения токенов JWT, которые затем могут быть использованы
+              для доступа к защищенным ресурсам.
+            - Важно, чтобы данные, переданные в запросе, содержали правильные
+              учетные данные пользователя для успешной аутентификации.
+        """
+        return super().post(request, *args, **kwargs)

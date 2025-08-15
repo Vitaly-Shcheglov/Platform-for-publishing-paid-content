@@ -138,8 +138,12 @@ class PostDetailView(LoginRequiredMixin, DetailView):
 
     model = Post
     form_class = PostForm
-    template_name = "posts/post_detail.html"
+    template_name = "posts/posts_detail.html"
     context_object_name = "post"
+
+    def get_queryset(self):
+        post_pk = self.kwargs["pk"]
+        return Post.objects.filter(id=post_pk)
 
 
 class AddPostView(CreateView):
@@ -226,7 +230,7 @@ class PostUpdateView(LoginRequiredMixin, UpdateView):
 
     model = Post
     form_class = PostForm
-    template_name = "posts/post_form.html"
+    template_name = "posts/posts_form.html"
     success_url = reverse_lazy("post_list")
 
     def test_func(self):
@@ -305,10 +309,10 @@ class PublishPostView(View):
         Returns:
             HttpResponse: Ответ с перенаправлением на список постов после успешной публикации.
         """
-        product = get_object_or_404(Post, pk=pk, owner=request.user)
-        product.is_published = True
-        product.save()
-        return redirect("product_list")
+        post = get_object_or_404(Post, pk=pk, owner=request.user)
+        post.is_published = True
+        post.save()
+        return redirect("post_list")
 
 
 class UnpublishPostView(LoginRequiredMixin, UserPassesTestMixin, View):
@@ -724,3 +728,41 @@ def subcategory_detail_view(request, subcategory_id):
     }
 
     return render(request, 'subcategory_detail.html', context)
+
+
+@login_required
+def update_post_status(request, post_id):
+    """
+    Обновляет статус 'Платная запись' для поста.
+
+    Это представление обрабатывает POST-запросы для обновления статуса платной записи
+    конкретного поста. Если запрос является GET, оно возвращает форму редактирования
+    поста с текущими данными.
+
+    Args:
+        request (HttpRequest): Объект запроса, содержащий данные о текущем запросе.
+        post_id (int): Идентификатор поста, для которого нужно обновить статус.
+
+    Returns:
+        HttpResponse:
+            - Перенаправление на страницу платных публикаций при успешном обновлении статуса.
+            - Отображение формы редактирования поста в случае GET-запроса, если пользователь
+              имеет доступ к этому представлению.
+
+    Примечания:
+        - Доступ к этому представлению ограничен аутентифицированными пользователями,
+          поскольку используется декоратор @login_required.
+        - Статус 'Платная запись' обновляется на основе значения, полученного из формы,
+          где пользователю предлагается выбрать, является ли запись платной или нет.
+        - В случае успешного обновления данных, пользователь будет перенаправлен на
+          страницу платных публикаций.
+    """
+    post = get_object_or_404(Post, id=post_id)
+
+    if request.method == "POST":
+        is_paid = request.POST.get("is_paid") == "True"
+        post.is_paid = is_paid
+        post.save()
+        return redirect('posts_paid')
+
+    return render(request, 'posts/posts_form.html', {'post': post})
