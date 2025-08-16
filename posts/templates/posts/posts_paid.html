@@ -1,0 +1,34 @@
+{% extends 'posts/base.html' %}
+
+{% block title %}Платные публикации{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Платные публикации</h1>
+    <p>Платные записи доступны только авторизованным пользователям, которые оплатили разовую подписку. Подписавшись, вы получите доступ к эксклюзивному контенту!</p>
+    <ul>
+        {% for post in paid_posts %}
+            <li>
+                <a href="{% url 'post_detail' post.id %}">{{ post.title }}</a>
+                <form method="POST" action="{% url 'update_post_status' post.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="is_paid_{{ post.id }}">Платная запись?</label>
+                        <select class="form-control" id="is_paid_{{ post.id }}" name="is_paid">
+                            <option value="False" {% if post.is_paid == False %}selected{% endif %}>Нет</option>
+                            <option value="True" {% if post.is_paid == True %}selected{% endif %}>Да</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-secondary">Сохранить статус</button>
+                </form>
+            </li>
+        {% empty %}
+            <li>Нет платных публикаций.</li>
+            <a href="{% url 'subscription' %}" class="btn btn-primary">Создать подписку</a>
+            <a href="{% url 'add_post' %}" class="btn btn-primary mt-3">Добавить запись</a>
+            <a class="p-2 btn btn-outline-primary" href="{% url 'post_list' %}">Список публикаций</a>
+            <a href="{% url 'home' %}" class="btn btn-secondary mt-3">Вернуться на главную</a>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

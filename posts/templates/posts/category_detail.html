@@ -1,0 +1,21 @@
+{% extends 'posts/base.html' %}
+
+{% block content %}
+    <h1>{{ category.name }}</h1>
+    <p>Описание: {{ category.description }}</p>
+
+    {% if parent_category %}
+        <h2>Родительская категория: {{ parent_category.name }}</h2>
+    {% else %}
+        <p>Эта категория не имеет родительской категории.</p>
+    {% endif %}
+
+    <h3>Подкатегории:</h3>
+    <ul>
+        {% for subcategory in category.subcategories.all %}
+            <li>{{ subcategory.name }}</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'post_list' %}">Вернуться к списку публикаций</a>
+{% endblock %}

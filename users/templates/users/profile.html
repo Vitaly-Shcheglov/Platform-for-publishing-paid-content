@@ -1,0 +1,17 @@
+{% extends 'posts/base.html' %}
+
+   {% block title %}Профиль пользователя{% endblock %}
+
+   {% block content %}
+       <div class="container">
+           <h1>Профиль пользователя</h1>
+           <p>Номер телефона: {{ user.phone_number }}
+           </p><p>Email: {{ user.email }}</p>
+           <p>Страна: {{ user.country }}</p>
+           {% if user.avatar %}
+               <img src="{{ user.avatar.url }}" alt="Аватар" class="img-fluid"><br>
+           {% endif %}
+           <a href="{% url 'profile_edit' %}" class="btn btn-primary">Редактировать профиль</a>
+           <a href="{% url 'login' %}" class="btn btn-link">Вход в систему</a>
+       </div>
+   {% endblock %}

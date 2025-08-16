@@ -1,0 +1,32 @@
+{% extends 'posts/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Категории</h1>
+    <ul class="list-group">
+        {% for category in categories %}
+            <li class="list-group-item">
+                <a href="#">{{ category.name }}</a>
+                {% if category.subcategories.count > 0 %}
+                <ul>
+                    {% for subcategory in category.subcategories.all %}
+                        <li>{{ subcategory.name }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </li>
+        {% empty %}
+            <li class="list-group-item">Нет категорий.</li>
+        {% endfor %}
+    </ul>
+
+    {% if user.is_authenticated %}
+        <p>Добро пожаловать, {{ user.username }}!</p>
+        {% if has_paid_subscription %}
+            <p>У вас активная подписка.</p>
+        {% else %}
+            <p>У вас нет активной подписки.</p>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

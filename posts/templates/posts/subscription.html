@@ -1,0 +1,44 @@
+{% extends 'posts/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Управление подпиской</h1>
+    <form id="subscription-form">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="plan" class="form-label">План подписки</label>
+            <select name="plan" class="form-control" id="plan" required>
+                <option value="basic">Базовый</option>
+                <option value="premium">Премиум</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="end_date" class="form-label">Дата окончания подписки</label>
+            <input type="date" name="end_date" class="form-control" id="end_date" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Создать подписку</button>
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#subscription-form').submit(function(event) {
+            event.preventDefault();  // Предотвращаем стандартное поведение формы
+
+            $.ajax({
+                type: 'POST',
+                url: '{% url "subscription" %}',  // Используем URL для создания подписки
+                data: $(this).serialize(),  // Сериализуем данные формы
+                success: function(response) {
+                    alert('Подписка успешно создана! ID: ' + response.subscription_id);
+                    // Дополнительные действия после успешной подписки
+                },
+                error: function(xhr, status, error) {
+                    alert('Ошибка: ' + xhr.responseText);
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

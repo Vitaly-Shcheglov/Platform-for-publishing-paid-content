@@ -1,0 +1,28 @@
+{% extends 'posts/base.html' %}
+
+{% block title %}Вход{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>Вход в систему</h1>
+        {% if error %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="username">phone_number пользователя</label>
+                <input type="text" name="phone_number" class="form-control" id="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Пароль</label>
+                <input type="password" name="password" class="form-control" id="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Войти</button>
+            <a href="{% url 'profile' %}" class="btn btn-link">Мой профиль</a>
+            <a href="{% url 'password_reset' %}">Забыли пароль?</a>
+            <a href="{% url 'register' %}" class="btn btn-link">Регистрация</a>
+            <a href="{% url 'home' %}" class="btn btn-secondary">Вернуться на главную</a>
+        </form>
+    </div>
+{% endblock %}

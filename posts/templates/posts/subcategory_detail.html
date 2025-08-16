@@ -1,0 +1,15 @@
+{% extends 'posts/base.html' %}
+
+{% block content %}
+    <h1>{{ subcategory.name }}</h1>
+    <p>Описание: {{ subcategory.description }}</p>
+
+    <h2>Посты в этой подкатегории:</h2>
+    <ul>
+        {% for post in subcategory.post_subcategories.all %}
+            <li>{{ post.title }}</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'category_detail' subcategory.category.id %}">Вернуться к категории</a>
+{% endblock %}
