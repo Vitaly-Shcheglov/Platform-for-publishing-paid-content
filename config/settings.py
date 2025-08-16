@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from datetime import timedelta
 from pathlib import Path
+import json
 
 from celery.schedules import crontab
 from dotenv import load_dotenv
@@ -161,27 +162,36 @@ AUTH_USER_MODEL = "users.CustomUser"
 
 LOGIN_URL = "/users/login/"
 
-CELERY_BROKER_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
+BASE_REDIS = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
 
-CELERY_RESULT_BACKEND = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", BASE_REDIS)
 
-CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", BASE_REDIS)
+CELERY_ACCEPT_CONTENT = json.loads(os.getenv("CELERY_ACCEPT_CONTENT", '["json"]'))
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 
 CELERY_BEAT_SCHEDULE = {
-    "deactivate-inactive-users-every-day": {
-        "task": "users.tasks.deactivate_inactive_users",
-        "schedule": crontab(hour=0, minute=0),
+    "send-reminders-every-minute": {
+        "task": "tasks.tasks.send_scheduled_reminders",
+        "schedule": crontab(),
     },
 }
 
+CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS", "https://yourfrontend.com").split(",")
+
+CACHE_LOCATION = os.environ.get("REDIS_CACHE_URL", os.environ.get("REDIS_URL", "redis://localhost:6379/1"))
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": CACHE_LOCATION,
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
     }
 }
+
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_simplejwt.authentication.JWTAuthentication",),

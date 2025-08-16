@@ -8,7 +8,8 @@ from rest_framework.test import APIClient
 
 from posts.models import Post
 
-from .models import CustomUser, Payment
+from .models import CustomUser
+from payments.models import Payment
 
 User = get_user_model()
 

@@ -651,7 +651,7 @@ def subscription_success_view(request):
     Returns:
         HttpResponse: Ответ с рендером шаблона успеха подписки.
     """
-    return render(request, "subscription_success.html")
+    return render(request, "posts/subscription_success.html")
 
 
 def category_detail_view(request, category_id):
