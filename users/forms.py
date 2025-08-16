@@ -11,31 +11,79 @@ class UserRegistrationForm(forms.ModelForm):
     Включает поле для ввода пароля с использованием защищенного поля ввода.
 
     Атрибуты:
-        password (CharField): Поле для ввода пароля, скрытое от глаз пользователя.
+        password1 (CharField): Поле для ввода пароля.
+        password2 (CharField): Поле для подтверждения пароля.
+
+    Метаданные:
+        Meta: Определяет модель и поля, которые будут использоваться в форме.
     """
 
-    password = forms.CharField(widget=forms.PasswordInput)
+    password1 = forms.CharField(
+        label="Пароль",
+        widget=forms.PasswordInput,
+        help_text="Введите пароль, который будет использоваться для вашей учетной записи."
+    )
+    password2 = forms.CharField(
+        label="Подтверждение пароля",
+        widget=forms.PasswordInput,
+        help_text="Введите тот же пароль еще раз для подтверждения."
+    )
 
     class Meta:
         model = CustomUser
-        fields = ["phone_number", "password", "avatar", "email", "country"]
+        fields = ('phone_number', 'avatar')
+
+    def clean_password2(self):
+        """
+        Проверяет, чтобы введенные пароли совпадали.
+
+        Если пароли не совпадают, вызывается ошибка валидации.
+
+        Returns:
+            str: Второй введенный пароль, если он совпадает с первым.
+
+        Raises:
+            ValidationError: Если пароли не совпадают.
+        """
+        password1 = self.cleaned_data.get("password1")
+        password2 = self.cleaned_data.get("password2")
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError("Пароли не совпадают.")
+        return password2
+
+    def clean_phone_number(self):
+        """
+        Проверяет, существует ли пользователь с таким номером телефона.
+
+        Если номер телефона уже используется, вызывается ошибка валидации.
+
+        Returns:
+            str: Номер телефона, введенный пользователем.
+
+        Raises:
+            ValidationError: Если номер телефона уже существует в базе данных.
+        """
+        phone = self.cleaned_data.get('phone_number')
+        if CustomUser.objects.filter(phone_number=phone).exists():
+            raise forms.ValidationError("Пользователь с таким номером телефона уже существует.")
+        return phone
 
     def save(self, commit=True):
         """
-        Сохраняет нового пользователя с установленным паролем.
+        Сохраняет новый объект пользователя.
 
-        Этот метод переопределяет стандартный метод сохранения, чтобы установить
-        пароль пользователя в зашифрованном виде.
+        Устанавливает пароль для пользователя, если он был введен.
 
-        Args:
-            commit (bool): Указывает, следует ли немедленно сохранять пользователя в базе данных.
-                            По умолчанию True.
+        Параметры:
+            commit (bool): Если True, сохраняет объект в базе данных. По умолчанию True.
 
         Returns:
-            CustomUser: Объект пользователя, который был создан или обновлен.
+            CustomUser: Созданный объект пользователя.
         """
         user = super().save(commit=False)
-        user.set_password(self.cleaned_data["password"])
+        password = self.cleaned_data.get('password1')
+        if password:
+            user.set_password(password)
         if commit:
             user.save()
         return user
@@ -54,4 +102,4 @@ class UserProfileForm(forms.ModelForm):
 
     class Meta:
         model = CustomUser
-        fields = ["avatar", "phone_number", "country"]
+        fields = ["avatar", "phone_number"]

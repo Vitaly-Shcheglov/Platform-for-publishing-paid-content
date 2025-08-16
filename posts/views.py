@@ -121,7 +121,6 @@ class ContactView(View):
             return HttpResponse("Пожалуйста, заполните все поля!", status=400)
 
 
-@method_decorator(cache_page(60 * 15), name="dispatch")
 class PostDetailView(LoginRequiredMixin, DetailView):
     """
     View для отображения деталей поста.
@@ -176,7 +175,7 @@ class AddPostView(CreateView):
             Response: Ответ с перенаправлением на success_url после успешного создания поста.
         """
         if self.request.user.is_authenticated:
-            form.instance.author = self.request.user
+            form.instance.owner = self.request.user
             form.instance.is_paid = form.cleaned_data.get("is_paid", False)
         else:
             form.instance.is_paid = False
@@ -242,7 +241,10 @@ class PostUpdateView(LoginRequiredMixin, UpdateView):
                          или состоит в группе модераторов постов; иначе False.
         """
         post = self.get_object()
-        return self.request.user == post.owner or self.request.user.groups.filter(name="Post moderator group").exists()
+        return (
+            self.request.user == post.owner
+            or self.request.user.groups.filter(name="Post moderator group").exists()
+        )
 
 
 class PostDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
@@ -323,7 +325,7 @@ class UnpublishPostView(LoginRequiredMixin, UserPassesTestMixin, View):
     если они являются владельцами этих постов или модераторами.
     """
 
-    permission_required = "catalog.can_unpublish_post"
+    permission_required = "posts.can_unpublish_post"
 
     def post(self, request, pk):
         """
@@ -355,7 +357,8 @@ class UnpublishPostView(LoginRequiredMixin, UserPassesTestMixin, View):
         """
         post = get_object_or_404(Post, pk=self.kwargs["pk"])
         return (
-            self.request.user == post.owner or self.request.user.groups.filter(name="Product moderator group").exists()
+            self.request.user == post.owner
+            or self.request.user.groups.filter(name="Post moderator group").exists()
         )
 
 
@@ -406,30 +409,30 @@ class PostsInCategoryView(ListView):
         return context
 
 
-@login_required
-def create_post(request):
-    """
-    Обрабатывает создание нового поста.
-
-    Этот view позволяет авторизованным пользователям создавать новые посты.
-
-    Args:
-        request (HttpRequest): Объект запроса, содержащий данные формы.
-
-    Returns:
-        HttpResponse: Перенаправление на домашнюю страницу после успешного создания поста
-                        или отображение формы создания поста.
-    """
-    if request.method == "POST":
-        form = PostForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.save()
-            return redirect("home")
-    else:
-        form = PostForm()
-    return render(request, "posts/create_post.html", {"form": form})
+# @login_required
+# def create_post(request):
+#     """
+#     Обрабатывает создание нового поста.
+#
+#     Этот view позволяет авторизованным пользователям создавать новые посты.
+#
+#     Args:
+#         request (HttpRequest): Объект запроса, содержащий данные формы.
+#
+#     Returns:
+#         HttpResponse: Перенаправление на домашнюю страницу после успешного создания поста
+#                         или отображение формы создания поста.
+#     """
+#     if request.method == "POST":
+#         form = PostForm(request.POST)
+#         if form.is_valid():
+#             post = form.save(commit=False)
+#             post.owner = request.user
+#             post.save()
+#             return redirect("home")
+#     else:
+#         form = PostForm()
+#     return render(request, "posts/create_post.html", {"form": form})
 
 
 class PostsFreeListView(ListView):

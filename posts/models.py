@@ -97,10 +97,10 @@ class Post(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="owned_posts", null=True)
+    image = models.ImageField(upload_to="uploads/", null=True, blank=True)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     is_published = models.BooleanField(default=False)
     is_paid = models.BooleanField(default=False)
-    image = models.ImageField(upload_to="uploads/", null=True, blank=True)
 
     class Meta:
         """

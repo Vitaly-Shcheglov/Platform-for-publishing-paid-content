@@ -1,7 +1,7 @@
 {% extends 'posts/base.html' %}
 {% load static %}
 
-{% load posts_filters %}
+<!--{% load posts_filters %}-->
 
 {% block title %}{{ post.title }}{% endblock %}
 
@@ -12,7 +12,7 @@
             <img src="{{ post.image.url }}" alt="{{ post.title }}">
         {% endif %}
         <p>{{ post.content }}</p>
-        {{post.is_published}}
+<!--        {{post.is_published}}-->
         {% if post.is_published %}
             <p class="text-success">Статус: Запись опубликована.</p>
         {% else %}

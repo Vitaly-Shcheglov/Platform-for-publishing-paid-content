@@ -26,7 +26,6 @@ class UserRegisterView(APIView):
     Представление для регистрации пользователей.
 
     Это представление обрабатывает POST-запросы для регистрации новых пользователей.
-    После успешной регистрации пользователю отправляется приветственное письмо.
 
     Атрибуты:
         permission_classes (list): Список классов разрешений, которые определяют, кто
@@ -41,8 +40,7 @@ class UserRegisterView(APIView):
         Обрабатывает POST-запрос для регистрации нового пользователя.
 
         Принимает данные пользователя, проверяет их валидность с помощью сериализатора
-        и создает нового пользователя. При успешном создании отправляется приветственное
-        письмо на указанный электронный адрес.
+        и создает нового пользователя.
 
         Параметры:
             request (Request): Объект запроса, содержащий данные для регистрации.
@@ -57,21 +55,6 @@ class UserRegisterView(APIView):
             user = serializer.save()
 
             refresh = RefreshToken.for_user(user)
-
-            try:
-                send_mail(
-                    "Добро пожаловать!",
-                    "Спасибо за регистрацию на нашем сайте.",
-                    "from@example.com",  # Замените на ваш реальный адрес
-                    [user.email],
-                    fail_silently=False,
-                )
-            except SMTPAuthenticationError:
-                print("Ошибка аутентификации SMTP: неверный пользователь или пароль.")
-            except BadHeaderError:
-                print("Некорректный заголовок письма.")
-            except Exception as e:
-                print(f"Ошибка при отправке письма: {e}")
 
             return Response({"message": "Пользователь успешно зарегистрирован.",
                 "refresh": str(refresh),
@@ -368,22 +351,7 @@ def register_view(request):
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
-
-            try:
-                send_mail(
-                    "Добро пожаловать!",
-                    "Спасибо за регистрацию на нашем сайте.",
-                    "from@example.com",
-                    [user.email],
-                    fail_silently=False,
-                )
-            except SMTPAuthenticationError:
-                print("Ошибка аутентификации SMTP: неверный пользователь или пароль.")
-            except BadHeaderError:
-                print("Некорректный заголовок письма.")
-            except Exception as e:
-                print(f"Ошибка при отправке письма: {e}")
-
+            messages.success(request, "Вы успешно зарегистрированы!")
             return redirect("login")
     else:
         form = UserRegistrationForm()
