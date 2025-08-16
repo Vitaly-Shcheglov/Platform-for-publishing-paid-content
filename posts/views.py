@@ -409,32 +409,6 @@ class PostsInCategoryView(ListView):
         return context
 
 
-# @login_required
-# def create_post(request):
-#     """
-#     Обрабатывает создание нового поста.
-#
-#     Этот view позволяет авторизованным пользователям создавать новые посты.
-#
-#     Args:
-#         request (HttpRequest): Объект запроса, содержащий данные формы.
-#
-#     Returns:
-#         HttpResponse: Перенаправление на домашнюю страницу после успешного создания поста
-#                         или отображение формы создания поста.
-#     """
-#     if request.method == "POST":
-#         form = PostForm(request.POST)
-#         if form.is_valid():
-#             post = form.save(commit=False)
-#             post.owner = request.user
-#             post.save()
-#             return redirect("home")
-#     else:
-#         form = PostForm()
-#     return render(request, "posts/create_post.html", {"form": form})
-
-
 class PostsFreeListView(ListView):
     """
     View для отображения бесплатных постов.

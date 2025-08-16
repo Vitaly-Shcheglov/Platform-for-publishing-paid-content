@@ -21,7 +21,6 @@ from .views import (
     category_detail_view,
     subcategory_detail_view,
     update_post_status,
-    # create_post
 )
 
 urlpatterns = [
@@ -45,5 +44,4 @@ urlpatterns = [
     path('category/<int:category_id>/', category_detail_view, name='category_detail'),
     path('subcategory/<int:subcategory_id>/', subcategory_detail_view, name='subcategory_detail'),
     path('post/<int:post_id>/update/', update_post_status, name='update_post_status'),
-    # path('create/', create_post, name='create_post'),
 ]
