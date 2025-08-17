@@ -1,0 +1,18 @@
+[
+    {
+        "model": "posts.category",
+        "pk": 1,
+        "fields": {
+            "name": "Категория 1",
+            "description": "Описание категории 1"
+        }
+    },
+    {
+        "model": "posts.subcategory",
+        "pk": 1,
+        "fields": {
+            "name": "Подкатегория А",
+            "category": 1
+        }
+    }
+]

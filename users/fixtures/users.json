@@ -1,0 +1,24 @@
+[
+    {
+        "model": "users.customuser",
+        "pk": 1,
+        "fields": {
+            "phone_number": "1234567890",
+            "password": "hashed_password",  // Замените на хешированный пароль
+            "avatar": null,
+            "email": "test@example.com",
+            "country": "Russia"
+        }
+    },
+    {
+        "model": "users.customuser",
+        "pk": 2,
+        "fields": {
+            "phone_number": "0987654321",
+            "password": "hashed_password",  // Замените на хешированный пароль
+            "avatar": null,
+            "email": "example@test.com",
+            "country": "USA"
+        }
+    }
+]

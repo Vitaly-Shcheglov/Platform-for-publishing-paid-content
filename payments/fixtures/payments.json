@@ -1,0 +1,22 @@
+[
+    {
+        "model": "posts.subscription",
+        "pk": 1,
+        "fields": {
+            "user": 1,
+            "amount": "100.00",
+            "created_at": "2025-07-01T00:00:00Z",
+            "is_active": true
+        }
+    },
+    {
+        "model": "posts.subscription",
+        "pk": 2,
+        "fields": {
+            "user": 1,
+            "amount": "50.00",
+            "created_at": "2025-07-02T00:00:00Z",
+            "is_active": true
+        }
+    }
+]

@@ -1,0 +1,46 @@
+{% extends 'posts/base.html' %}
+{% load static %}
+
+<!--{% load posts_filters %}-->
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>{{ post.title }}</h1>
+        {% if post.image %}
+            <img src="{{ post.image.url }}" alt="{{ post.title }}">
+        {% endif %}
+        <p>{{ post.content }}</p>
+<!--        {{post.is_published}}-->
+        {% if post.is_published %}
+            <p class="text-success">Статус: Запись опубликована.</p>
+        {% else %}
+            <p class="text-danger">Статус: Запись не опубликована.</p>
+        {% endif %}
+
+        {% if request.user|is_group:"Post moderator group" %}
+            <form action="{% url 'unpublish_post' post.pk %}" method="POST" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Отменить публикацию</button>
+            </form>
+            <form action="{% url 'post_delete' post.pk %}" method="POST" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Вы уверены, что хотите удалить 'эту запись'?');">Удалить</button>
+            </form>
+        {% endif %}
+
+        {% if request.user == post.owner %}
+            <form action="{% url 'publish_post' post.pk %}" method="POST" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">Опубликовать</button>
+            </form>
+            <a href="{% url 'post_edit' post.pk %}" class="btn btn-secondary">Редактировать</a>
+            <form action="{% url 'post_delete' post.pk %}" method="POST" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Вы уверены, что хотите удалить 'эту запись'?');">Удалить</button>
+            </form>
+        {% endif %}
+        <a href="{% url 'post_list' %}" class="btn btn-primary">Назад к списку</a>
+    </div>
+{% endblock %}
