@@ -1,0 +1,23 @@
+[run]
+source =  payments, posts, users
+
+[report]
+omit =
+    */venv/*
+    */migrations/*
+    */management/*
+    */__init__.py*
+    */admin.py*
+    */apps.py*
+    */forms.py*
+    */paginators.py*
+    */permissions.py*
+    */tests.py*
+    */urls.py*
+    */payments/services.py
+    */users/tasks.py
+    */posts/services.py
+    */users/serializers.py
+    */payments/views.py
+    */users/views.py
+    */posts/views.py

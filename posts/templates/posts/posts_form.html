@@ -1,0 +1,27 @@
+{% extends 'posts/base.html' %}
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+{% block title%}{% if object %}Редактирование записи{% else %}Создание записи{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>{% if object %}Редактирование записи{% else %}Создание записи{% endif %}</h1>
+    
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <div class="form-group">
+            <label for="is_paid">Платная запись?</label>
+            <select class="form-control" id="is_paid" name="is_paid">
+                <option value="False" {% if post and not post.is_paid %}selected{% endif %}>Нет</option>
+                <option value="True" {% if post and post.is_paid %}selected{% endif %}>Да</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">{% if object %}Сохранить изменения{% else %}Создать запись{% endif %}</button>
+        <a href="{% url 'post_list' %}" class="btn btn-secondary">Отмена</a>
+    </form>
+</div>
+{% endblock %}
